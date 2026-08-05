@@ -1,0 +1,1209 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vocabulary Trainer Pro - Flashcard Mode</title>
+  <style>
+    :root{
+      --bg:#eef3fb;
+      --bg-2:#f4f7fd;
+      --card:#ffffff;
+      --line:#e2eaf9;
+      --line-2:#d7e3fb;
+      --text:#0f1f44;
+      --muted:#5f6f8e;
+      --primary:#3b82f6;
+      --primary-2:#2563eb;
+      --btn-dark:#5f6f88;
+      --btn-dark-2:#4f617b;
+      --ok:#16a34a;
+      --warn:#d97706;
+      --bad:#dc2626;
+      --radius-sm:10px;
+      --radius-md:12px;
+      --radius-lg:16px;
+      --shadow-1:0 4px 12px rgba(34,80,170,.06);
+      --shadow-2:0 10px 24px rgba(67,106,181,.10);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; }
+    body{
+      font-family:"Segoe UI","Noto Sans TC",system-ui,-apple-system,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, #e8f0ff 0%, rgba(232,240,255,0) 32%),
+        radial-gradient(circle at 90% 0%, #f1edff 0%, rgba(241,237,255,0) 30%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    }
+
+    .container{ max-width:1100px; margin:12px auto 20px; padding:0 10px; }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius-md);
+      box-shadow:var(--shadow-1);
+      padding:10px;
+      margin-bottom:10px;
+    }
+
+    .hero{
+      border:1px solid var(--line-2);
+      border-radius:14px;
+      box-shadow:var(--shadow-2);
+      padding:12px 14px 10px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(115,157,255,.18) 0%, rgba(115,157,255,0) 28%),
+        radial-gradient(circle at 86% 16%, rgba(179,146,255,.16) 0%, rgba(179,146,255,0) 26%),
+        linear-gradient(135deg, #edf4ff 0%, #f7faff 46%, #ffffff 100%);
+    }
+
+    .hero h1{ margin:0 0 2px; font-size:36px; font-weight:900; }
+    .hero p{ margin:0; font-size:14px; color:#1f345f; font-weight:700; }
+    .tip{
+      display:inline-flex; margin-top:8px; font-size:12px; font-weight:800;
+      padding:4px 10px; border-radius:999px; border:1px solid #cfe0ff; color:#274783;
+      background:linear-gradient(90deg,#e8f0ff 0%, #eef3ff 100%);
+    }
+
+    .bar{
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fbfdff;
+      padding:8px;
+      margin-bottom:7px;
+    }
+
+    .row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .grow{ flex:1; min-width:220px; }
+    .label{ font-size:12px; font-weight:800; color:#4d5f80; }
+
+    input[type="text"], input[type="file"], select{
+      border:1px solid #dbe6fb; border-radius:8px; background:#fff; color:#182848;
+      min-height:32px; padding:5px 9px; font-size:12px;
+    }
+    input[type="file"]{ max-width:220px; }
+
+    .file-name{
+      display:inline-flex; align-items:center; min-height:32px; padding:0 9px;
+      border:1px dashed #cbd9f4; border-radius:8px; background:#fff; color:#5c6b87; font-size:12px;
+      max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+
+    button{
+      border:1px solid #cfdcf7; border-radius:8px; min-height:32px; padding:5px 11px;
+      font-size:12px; font-weight:900; cursor:pointer; color:#fff;
+      background:linear-gradient(180deg,var(--btn-dark) 0%,var(--btn-dark-2) 100%);
+    }
+    button.primary{ border-color:transparent; background:linear-gradient(180deg,#8eb2ff 0%,#6f9dff 100%); }
+    button.ghost{ color:#20335e; background:#fff; border-color:#d5e2fb; }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+
+    .meta{ font-size:12px; color:var(--muted); font-weight:700; }
+    .ok{ color:var(--ok); font-weight:800; }
+
+    .hidden{ display:none !important; }
+
+    .tabs{ display:flex; gap:8px; }
+    .tab.active{ background:linear-gradient(180deg,#8eb2ff 0%,#6f9dff 100%); border-color:transparent; color:#fff; }
+
+    .status-row{
+      display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;
+      font-size:12px; color:#4d5f80; font-weight:700;
+    }
+
+    .fc-head{
+      display:grid; grid-template-columns: 1.5fr .6fr .6fr auto auto; gap:10px; align-items:center;
+      border-top:1px solid #e9efff; padding-top:10px; margin-top:8px;
+    }
+    .word{ font-size:40px; font-weight:900; line-height:1.05; }
+    .zh{ font-size:30px; font-weight:900; color:#1f345f; margin-top:2px; }
+    .tiny{ font-size:12px; color:#64748b; font-weight:800; }
+
+    .pill{
+      display:inline-flex; align-items:center; border:1px solid #d5e2fb; background:#f2f7ff;
+      color:#23407a; border-radius:999px; padding:3px 9px; font-size:12px; font-weight:900;
+    }
+
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .box{
+      border:1px solid #e4ecff; border-radius:10px; background:#fff; padding:10px;
+    }
+    .box h4{ margin:0 0 6px; font-size:13px; color:#1f345f; }
+    .text{ font-size:14px; color:#0f1f44; }
+
+    .reading{
+      border:1px solid #e4ecff; border-radius:10px; background:#fff; padding:10px;
+      margin-top:10px;
+    }
+    .reading h3{ margin:0 0 8px; }
+    .reading p{ margin:0 0 8px; line-height:1.7; }
+
+    .empty{
+      border:1px dashed #d5e2fb; border-radius:10px; background:linear-gradient(180deg,#fcfeff 0%,#f7fbff 100%);
+      padding:20px 12px; text-align:center;
+    }
+
+    @media (max-width:900px){
+      .fc-head{ grid-template-columns:1fr 1fr; }
+      .grid2{ grid-template-columns:1fr; }
+      .word{ font-size:32px; }
+      .zh{ font-size:24px; }
+    }
+    /* --- PATCH: Reading header with right-top toggle button --- */
+    .reading-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .reading-head h3{ margin:0; }
+    .zh-reading{ margin-top:8px; }
+    .zh-reading.is-collapsed{
+      display:none;
+    }
+
+    /* Morpheme Highlight 外框質感 */
+    .box .tiny{
+      letter-spacing:.2px;
+    }
+
+    /* 專門強化 Morpheme Highlight 這排 pills，不改位置 */
+    .box .text .pill{
+      margin-right:6px;
+      margin-top:6px;
+      border-width:1px;
+      box-shadow:0 1px 2px rgba(31,52,95,.08);
+      transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    }
+    .box .text .pill:hover{
+      transform:translateY(-1px);
+      box-shadow:0 4px 10px rgba(31,52,95,.12);
+      filter:saturate(1.05);
+    }
+
+    /* Prefix / Root / Suffix 三色（沿用你現有 pill，不改排版） */
+    .box .text .pill:nth-child(1){
+      color:#1d4ed8;
+      border-color:#cfe1ff;
+      background:linear-gradient(180deg,#edf4ff 0%, #e3efff 100%);
+    }
+    .box .text .pill:nth-child(2){
+      color:#5b21b6;
+      border-color:#e0d2ff;
+      background:linear-gradient(180deg,#f3edff 0%, #ece2ff 100%);
+    }
+    .box .text .pill:nth-child(3){
+      color:#166534;
+      border-color:#ccefd5;
+      background:linear-gradient(180deg,#ecfbef 0%, #e2f8e8 100%);
+    }
+
+    /* 手機上視覺更穩（不更動欄位數） */
+    @media (max-width:900px){
+      .box .text .pill{ margin-top:4px; }
+    }
+    /* =========================================================
+     PATCH PRO: 詞源解析區 1:1 近似樣式（不改 layout / HTML）
+     目標：右側 .grid2 的第 2 個 .box（詞源解析）
+     ========================================================= */
+
+    /* 主容器：淡藍外框 + 乾淨底色 */
+    .grid2 > .box:nth-child(2){
+      position: relative;
+      border:1px solid #dbe8ff;
+      border-radius:12px;
+      background:linear-gradient(180deg,#ffffff 0%, #fcfeff 100%);
+      box-shadow:0 2px 10px rgba(59,130,246,.06);
+      overflow:hidden;
+      padding:12px;
+    }
+
+    /* 標題列（詞源解析） */
+    .grid2 > .box:nth-child(2) > h4{
+      position:relative;
+      margin:0;
+      padding:0 38px 10px 0;
+      border-bottom:1px solid #edf3ff;
+      font-size:20px;
+      line-height:1.1;
+      font-weight:900;
+      color:#0f1f44;
+      letter-spacing:.2px;
+    }
+
+    /* 讓內容形成你圖裡的卡片群感 */
+    .grid2 > .box:nth-child(2) .text{
+      margin:10px 0 0;
+      border-radius:12px;
+      border:1px solid #e7efff;
+      background:#fff;
+      padding:12px 14px;
+      font-size:15px;
+      line-height:1.65;
+      color:#0f1f44;
+    }
+
+    /* Prefix 卡 */
+    .grid2 > .box:nth-child(2) .text:nth-of-type(1){
+      border-color:#cfe1ff;
+      background:linear-gradient(180deg,#f7fbff 0%, #f3f8ff 100%);
+    }
+    .grid2 > .box:nth-child(2) .text:nth-of-type(1) b{
+      color:#2563eb;
+    }
+
+    /* Root 卡 */
+    .grid2 > .box:nth-child(2) .text:nth-of-type(2){
+      border-color:#e3d8ff;
+      background:linear-gradient(180deg,#fbf9ff 0%, #f6f2ff 100%);
+    }
+    .grid2 > .box:nth-child(2) .text:nth-of-type(2) b{
+      color:#6d28d9;
+    }
+
+    /* Suffix 卡 */
+    .grid2 > .box:nth-child(2) .text:nth-of-type(3){
+      border-color:#cbefd7;
+      background:linear-gradient(180deg,#f7fff9 0%, #effcf4 100%);
+    }
+    .grid2 > .box:nth-child(2) .text:nth-of-type(3) b{
+      color:#15803d;
+    }
+
+    /* 字義補充（橘色大卡群） */
+    .grid2 > .box:nth-child(2) .text:nth-of-type(4),
+    .grid2 > .box:nth-child(2) .text:nth-of-type(5),
+    .grid2 > .box:nth-child(2) .text:nth-of-type(6){
+      border-color:#ffd7a8;
+      background:linear-gradient(180deg,#fffaf3 0%, #fff5e9 100%);
+    }
+    .grid2 > .box:nth-child(2) .text:nth-of-type(4) b,
+    .grid2 > .box:nth-child(2) .text:nth-of-type(5) b,
+    .grid2 > .box:nth-child(2) .text:nth-of-type(6) b{
+      color:#c2410c;
+    }
+
+    /* 小優化：避免你原本 .text 太密 */
+    .grid2 > .box:nth-child(2) .text br{
+      line-height:1.9;
+    }
+
+    /* 手機端維持比例（不改欄位） */
+    @media (max-width:900px){
+      .grid2 > .box:nth-child(2) > h4{
+        font-size:28px;
+      }
+      .grid2 > .box:nth-child(2) > h4::after{
+        border-left-width:8px;
+        border-right-width:8px;
+        border-top-width:13px;
+        top:2px;
+      }
+    }
+    /* ===== PATCH: 左側「例句與延伸」四色卡片化（不改 layout） ===== */
+
+    /* 左側主框微調 */
+    .grid2 > .box:nth-child(1){
+      border-color:#dfe9ff;
+      background:linear-gradient(180deg,#ffffff 0%, #fcfeff 100%);
+      box-shadow:0 2px 10px rgba(47,84,170,.05);
+    }
+
+    /* 標題列 */
+    .grid2 > .box:nth-child(1) > h4{
+      position:relative;
+      margin:0;
+      padding:0 38px 10px 0;
+      padding-bottom:8px;
+      border-bottom:1px solid #edf3ff;
+      font-size:20px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:.2px;
+      color:#0f1f44;
+    }
+
+    /* 每段內容都變成獨立卡片 */
+    .grid2 > .box:nth-child(1) .text{
+      margin:10px 0 0;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid #e7efff;
+      background:#fff;
+      font-size:15px;   /* 新增：和右邊一致 */
+      line-height:1.7;
+    }
+
+    /* 第 1 卡：Examples（藍） */
+    .grid2 > .box:nth-child(1) .text:nth-of-type(1){
+      border-color:#cfe1ff;
+      background:linear-gradient(180deg,#f7fbff 0%, #f2f8ff 100%);
+    }
+    .grid2 > .box:nth-child(1) .text:nth-of-type(1) b{
+      color:#2563eb;
+    }
+
+    /* 第 2 卡：Collocation（綠） */
+    .grid2 > .box:nth-child(1) .text:nth-of-type(2){
+      border-color:#cdeed8;
+      background:linear-gradient(180deg,#f7fff9 0%, #effcf4 100%);
+    }
+    .grid2 > .box:nth-child(1) .text:nth-of-type(2) b{
+      color:#166534;
+    }
+
+    /* 第 3 卡：同源字（紫） */
+    .grid2 > .box:nth-child(1) .text:nth-of-type(3){
+      border-color:#e3d8ff;
+      background:linear-gradient(180deg,#fbf9ff 0%, #f6f2ff 100%);
+    }
+    .grid2 > .box:nth-child(1) .text:nth-of-type(3) b{
+      color:#6d28d9;
+    }
+
+    /* 第 4 卡：詞性延伸（橘） */
+    .grid2 > .box:nth-child(1) .text:nth-of-type(4){
+      border-color:#ffd7a8;
+      background:linear-gradient(180deg,#fffaf3 0%, #fff5e9 100%);
+    }
+    .grid2 > .box:nth-child(1) .text:nth-of-type(4) b{
+      color:#c2410c;
+    }
+
+    /* 讓 Examples 內部英文/中文更像示意圖 */
+    .grid2 > .box:nth-child(1) .text:nth-of-type(1) br + b{
+      display:inline-block;
+      margin-top:8px;
+      padding-top:8px;
+      border-top:1px solid #dbeafe;
+      width:100%;
+    }
+
+    /* 卡片 hover（輕微） */
+    .grid2 > .box:nth-child(1) .text{
+      transition:transform .14s ease, box-shadow .14s ease;
+    }
+    .grid2 > .box:nth-child(1) .text:hover{
+      transform:translateY(-1px);
+      box-shadow:0 4px 10px rgba(37,99,235,.08);
+    }
+    /* Examples + 例句翻譯 合併同色卡 */
+    .grid2 > .box:nth-child(1) .text.ex-card{
+      border-color:#cfe1ff;
+      background:linear-gradient(180deg,#f7fbff 0%, #f2f8ff 100%);
+    }
+    .grid2 > .box:nth-child(1) .text.ex-card b{
+      color:#2563eb;
+    }
+
+    /* 讓「例句翻譯」在同一卡內有分隔線 */
+    .grid2 > .box:nth-child(1) .text.ex-card br + b{
+      display:inline-block;
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid #dbeafe;
+      width:100%;
+      }
+      /* ===== PATCH: 左右 box 內距一致（穩定對齊） ===== */
+    .grid2 > .box:nth-child(1),
+    .grid2 > .box:nth-child(2){
+      padding:12px;
+    }
+    .quiz-q{
+      border:1px solid #e4ecff;
+      border-radius:12px;
+      padding:12px;
+      background:#fff;
+      margin-bottom:10px;
+    }
+    .quiz-q h4{
+      margin:0 0 8px;
+      font-size:15px;
+      color:#1f345f;
+    }
+    .quiz-stem{
+      margin:0 0 10px;
+      font-size:16px;
+      font-weight:800;
+      color:#0f1f44;
+      line-height:1.6;
+    }
+
+    /* 只讓 Q3 題幹不粗體 */
+    #q3 .quiz-stem{
+      font-weight:400;
+    }
+
+    .quiz-options{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .quiz-option{
+      text-align:left;
+      border:1px solid #dbe6fb;
+      background:#fff;
+      color:#20335e;
+      font-size:15px;     /* 放大字體 */
+      font-weight:400;    /* 可選：加粗更清楚 */
+      line-height:1.4;    /* 可選：避免擠在一起 */
+    }
+    .quiz-option.correct{
+      border-color:#86efac;
+      background:#f0fdf4;
+      color:#166534;
+    }
+    .quiz-option.wrong{
+      border-color:#fecaca;
+      background:#fef2f2;
+      color:#991b1b;
+    }
+    .quiz-option:disabled{
+      opacity:1;
+      cursor:default;
+    }
+    .quiz-result{
+      margin-top:8px;
+      font-size:13px;
+      font-weight:800;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero card">
+      <h1>🚀 Vocabulary Trainer Pro</h1>
+      <p>上傳 CSV，今天多一點，明天會感謝現在努力的自己。</p>
+      <span class="tip">😎 單字不會背叛你，除非你先跳過它。</span>
+    </section>
+
+    <section class="card">
+      <div class="bar">
+        <div class="row">
+          <label class="label" for="csvFile">選擇檔案</label>
+          <input id="csvFile" type="file" accept=".csv,text/csv,.tsv,text/tab-separated-values" />
+          <span id="fileName" class="file-name">尚未選擇檔案</span>
+
+          <button id="importBtn" class="primary" disabled>匯入 CSV</button>
+
+          <div class="tabs">
+            <button id="flashTabBtn" class="tab active">閃卡模式</button>
+            <button id="quizTabBtn" class="tab" disabled>測驗模式</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bar">
+        <div class="row">
+          <span class="label">發音速度</span>
+          <input id="rateRange" type="range" min="0.6" max="1.4" step="0.1" value="1.0" />
+          <span id="rateText" class="meta">1.0x</span>
+          <button id="resetRateBtn" class="ghost">重設語速</button>
+
+          <label class="label" style="margin-left:12px;">自動朗讀</label>
+          <input id="autoSpeakToggle" type="checkbox" />
+
+        </div>
+      </div>
+
+      <div class="bar hidden" id="filterBar">
+        <div class="row">
+          <span class="label">搜尋</span>
+          <input id="searchInput" class="grow" type="text" placeholder="單字 / 中文 / 字根 / 例句" />
+
+          <span class="label">Level</span>
+          <select id="levelFilter"><option value="all">全部</option></select>
+
+          <span class="label">Unit 首字母</span>
+          <select id="unitFilter"><option value="all">全部</option></select>
+
+          <button id="clearFilterBtn" class="ghost">清除篩選</button>
+        </div>
+      </div>
+
+      <div id="meta" class="meta">狀態：尚未載入資料。請先選擇 CSV 並按「匯入 CSV」。</div>
+    </section>
+
+    <section id="emptyState" class="card">
+      <div class="empty">
+        <div style="font-size:24px;">📂</div>
+        <h3 style="margin:6px 0 4px;">尚未載入資料</h3>
+        <p class="meta">Step 1. 選擇 CSV → Step 2. 按「匯入 CSV」→ Step 3. 開始閃卡學習</p>
+      </div>
+    </section>
+
+    <section id="flashSection" class="card hidden">
+      <div class="status-row">
+        <div><span class="pill" id="countPill">0 / 0</span></div>
+        <div class="meta">目前篩選：<span id="filterStat">0 筆</span></div>
+      </div>
+
+      <div id="flashCard"></div>
+    </section>
+
+    <section id="quizSection" class="card hidden">
+      <div class="status-row">
+        <div><span class="pill" id="quizCountPill">0 / 0</span></div>
+        <div class="meta">每字 3 題（英中 / 例句 / 短文）</div>
+      </div>
+
+      <!-- 題型控制列 -->
+      <div class="bar" style="margin-top:10px;">
+        <div class="row" style="justify-content:space-between;">
+          <div class="row">
+            <span class="label">題型</span>
+            <label><input type="checkbox" id="toggleQ1" checked> Q1</label>
+            <label><input type="checkbox" id="toggleQ2" checked> Q2</label>
+            <label><input type="checkbox" id="toggleQ3" checked> Q3</label>
+          </div>
+          <button id="resetQuizTypeBtn" class="ghost">重設題型</button>
+        </div>
+      </div>
+
+      <div class="bar" style="margin-top:10px;">
+        <div class="row" style="justify-content:space-between;">
+          <div class="meta">本次錯題：<span id="wrongCountText">0</span> 題</div>
+          <div class="row">
+            <button id="wrongOnlyBtn" class="ghost">只練錯題：關</button>
+            <button id="resetWrongBtn" class="ghost">清空錯題</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="quizCard" style="margin-top:10px;"></div>
+
+      <div class="row" style="justify-content:flex-end; margin-top:10px;">
+        <button id="quizPrevBtn">上一組</button>
+        <button id="quizRandomBtn" class="ghost">隨機出題</button>
+        <button id="quizNextBtn" class="primary">下一組</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const REQUIRED_COLUMNS = [
+      "id","level","unit","word","pos","zh","ipa_us","tts_text","tts_lang","variants",
+      "prefix","prefix_meaning","prefix_meaning_zh","root","root_meaning","root_meaning_zh",
+      "suffix","suffix_meaning","literal_imagery_zh","meaning_association_zh","usage_note_zh",
+      "example_en","example_zh","cognate_extension_zh","word_family_zh","collocation",
+      "reading_en","answer","reading_zh"
+    ];
+
+    let allData = [];
+    let filteredData = [];
+    let currentIndex = 0;
+
+    const csvFile = document.getElementById("csvFile");
+    const fileName = document.getElementById("fileName");
+    const importBtn = document.getElementById("importBtn");
+    const quizTabBtn = document.getElementById("quizTabBtn");
+
+    const rateRange = document.getElementById("rateRange");
+    const rateText = document.getElementById("rateText");
+    const resetRateBtn = document.getElementById("resetRateBtn");
+    const autoSpeakToggle = document.getElementById("autoSpeakToggle");
+
+    const filterBar = document.getElementById("filterBar");
+    const searchInput = document.getElementById("searchInput");
+    const levelFilter = document.getElementById("levelFilter");
+    const unitFilter = document.getElementById("unitFilter");
+    const clearFilterBtn = document.getElementById("clearFilterBtn");
+
+    const meta = document.getElementById("meta");
+    const emptyState = document.getElementById("emptyState");
+    const flashSection = document.getElementById("flashSection");
+    const flashCard = document.getElementById("flashCard");
+    const countPill = document.getElementById("countPill");
+    const filterStat = document.getElementById("filterStat");
+
+    const flashTabBtn = document.getElementById("flashTabBtn");
+    const quizSection = document.getElementById("quizSection");
+    const quizCard = document.getElementById("quizCard");
+    const quizCountPill = document.getElementById("quizCountPill");
+    const quizPrevBtn = document.getElementById("quizPrevBtn");
+    const quizRandomBtn = document.getElementById("quizRandomBtn");
+    const quizNextBtn = document.getElementById("quizNextBtn");
+    const resetQuizTypeBtn = document.getElementById("resetQuizTypeBtn");
+    const toggleQ1 = document.getElementById("toggleQ1");
+    const toggleQ2 = document.getElementById("toggleQ2");
+    const toggleQ3 = document.getElementById("toggleQ3");
+
+    const wrongCountText = document.getElementById("wrongCountText");
+    const wrongOnlyBtn = document.getElementById("wrongOnlyBtn");
+    const resetWrongBtn = document.getElementById("resetWrongBtn");
+
+    let quizIndex = 0;
+    let quizRandomOrder = [];
+    let quizRandomPtr = 0;
+    let wrongSet = new Set();   // 記錄答錯的單字（用 word 當 key）
+    let wrongOnlyMode = false;  // 是否只練錯題
+
+
+    function parseDelimited(text){
+      const firstLine = text.split(/\r?\n/).find(Boolean) || "";
+      const tabCount = (firstLine.match(/\t/g) || []).length;
+      const commaCount = (firstLine.match(/,/g) || []).length;
+      const delimiter = tabCount > commaCount ? "\t" : ",";
+
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let inQuotes = false;
+
+      for(let i=0;i<text.length;i++){
+        const ch = text[i];
+        const next = text[i+1];
+
+        if(ch === '"'){
+          if(inQuotes && next === '"'){ cell += '"'; i++; }
+          else inQuotes = !inQuotes;
+        }else if(ch === delimiter && !inQuotes){
+          row.push(cell); cell = "";
+        }else if((ch === "\n" || ch === "\r") && !inQuotes){
+          if(ch === "\r" && next === "\n") i++;
+          row.push(cell);
+          if(row.some(v => v !== "")) rows.push(row);
+          row = []; cell = "";
+        }else cell += ch;
+      }
+      if(cell.length || row.length){
+        row.push(cell);
+        if(row.some(v => v !== "")) rows.push(row);
+      }
+      return { rows, delimiter };
+    }
+
+    function mapRowsToObjects(rows){
+      const header = rows[0].map(h => String(h).trim());
+      const lower = header.map(h => h.toLowerCase());
+      const missing = REQUIRED_COLUMNS.filter(c => !lower.includes(c));
+      if(missing.length){
+        console.warn("Missing columns:", missing);
+      }
+
+      return rows.slice(1).map(r=>{
+        const obj = {};
+        header.forEach((h, i)=> obj[h.toLowerCase()] = (r[i] ?? "").trim());
+        return obj;
+      }).filter(r => r.word);
+    }
+
+    function buildFilters(){
+      const levels = [...new Set(allData.map(d=>d.level).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+      const units = [...new Set(allData.map(d=>(d.unit||"").charAt(0).toUpperCase()).filter(Boolean))].sort();
+
+      levelFilter.innerHTML = `<option value="all">全部</option>` + levels.map(v=>`<option value="${v}">${v}</option>`).join("");
+      unitFilter.innerHTML = `<option value="all">全部</option>` + units.map(v=>`<option value="${v}">${v}</option>`).join("");
+    }
+
+    function applyFilters(keepCurrentWord=true){
+      const q = searchInput.value.trim().toLowerCase();
+      const lv = levelFilter.value;
+      const uv = unitFilter.value;
+
+      const currentWord = keepCurrentWord && filteredData[currentIndex] ? filteredData[currentIndex].word : null;
+
+      filteredData = allData.filter(d=>{
+        const text = [
+          d.word,d.zh,d.prefix,d.root,d.suffix,d.example_en,d.example_zh,d.reading_en,d.reading_zh
+        ].join(" ").toLowerCase();
+
+        const hitQ = !q || text.includes(q); // 不做多關鍵字 AND（依你需求）
+        const hitL = lv === "all" || d.level === lv;
+        const hitU = uv === "all" || (d.unit||"").charAt(0).toUpperCase() === uv;
+        return hitQ && hitL && hitU;
+      });
+
+      if(currentWord){
+        const idx = filteredData.findIndex(d => d.word === currentWord);
+        currentIndex = idx >= 0 ? idx : 0;
+      }else currentIndex = 0;
+
+      quizIndex = currentIndex;    // 直接同步到同一字
+      resetQuizRandomOrder(currentIndex);
+      renderFlashcard();
+    }
+
+    function speakCurrent(){
+      if(!filteredData.length) return;
+      const d = filteredData[currentIndex];
+      const utter = new SpeechSynthesisUtterance(d.tts_text || d.word);
+      utter.lang = d.tts_lang || "en-US";
+      utter.rate = Number(rateRange.value);
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    function shuffle(arr){
+      const a = [...arr];
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function resetQuizRandomOrder(startIndex = -1){
+      const active = getActiveQuizData();
+      quizRandomOrder = active.map((_, i) => i);
+      quizRandomOrder = shuffle(quizRandomOrder);
+
+      if(quizRandomOrder.length > 1 && startIndex >= 0 && quizRandomOrder[0] === startIndex){
+        [quizRandomOrder[0], quizRandomOrder[1]] = [quizRandomOrder[1], quizRandomOrder[0]];
+      }
+      quizRandomPtr = 0;
+    }
+
+    function sampleWrong(pool, correct, n=3){
+      const uniq = [...new Set(pool.filter(v => v && v !== correct))];
+      return shuffle(uniq).slice(0, n);
+    }
+
+    function ensureOptions(options, fallback){
+      const out = [...options];
+      while(out.length < 4) out.push(fallback || "-");
+      return out.slice(0,4);
+    }
+    function escapeRegExp(str){
+      return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function maskWordInSentence(sentence, target){
+      if(!sentence || !target) return sentence || "-";
+      const re = new RegExp(`\\b${escapeRegExp(target)}\\b`, "gi");
+      const masked = sentence.replace(re, "_____");
+      return masked === sentence ? sentence.replace(new RegExp(escapeRegExp(target), "gi"), "_____") : masked;
+    }
+
+    function renderQuestion({
+      container, qid, title, stem, options, answer, wordKey
+    }){
+      container.insertAdjacentHTML("beforeend", `
+        <div class="quiz-q" id="${qid}">
+          <h4>${title}</h4>
+          <p class="quiz-stem">${stem}</p>
+          <div class="quiz-options">
+            ${options.map(opt => `<button class="quiz-option" data-opt="${String(opt).replace(/"/g,'&quot;')}">${opt}</button>`).join("")}
+          </div>
+          <div class="quiz-result hidden"></div>
+        </div>
+      `);
+
+      const qEl = document.getElementById(qid);
+      const btns = [...qEl.querySelectorAll(".quiz-option")];
+      const result = qEl.querySelector(".quiz-result");
+
+      btns.forEach(btn=>{
+        btn.onclick = () => {
+          const chosen = btn.getAttribute("data-opt");
+          const ok = chosen === answer;
+
+          // ✅ 用 wordKey 記錄錯題（最穩）
+          if(!ok && wordKey){
+            wrongSet.add(wordKey);
+            updateWrongUI();
+          }
+
+          btns.forEach(b=>{
+            const v = b.getAttribute("data-opt");
+            b.disabled = true;
+            if(v === answer) b.classList.add("correct");
+          });
+
+          if(!ok){
+            btn.classList.add("wrong");
+          }
+
+          result.classList.remove("hidden");
+          result.innerHTML = ok
+            ? `✅ 答對了`
+            : `❌ 答錯，正確答案：<b>${answer}</b>`;
+        };
+      });
+    }
+
+    function getQuizTypeState(){
+      return {
+        q1: !!toggleQ1.checked,
+        q2: !!toggleQ2.checked,
+        q3: !!toggleQ3.checked
+      };
+    }
+
+    function getActiveQuizData(){
+      if(!wrongOnlyMode) return filteredData;
+      return filteredData.filter(d => wrongSet.has(d.word));
+    }
+
+    function updateWrongUI(){
+      if(wrongCountText) wrongCountText.textContent = String(wrongSet.size);
+      if(wrongOnlyBtn) wrongOnlyBtn.textContent = `只練錯題：${wrongOnlyMode ? "開" : "關"}`;
+    }
+
+    function syncQuizIndexWithActivePool(){
+      const active = getActiveQuizData();
+      if(!active.length){
+        quizIndex = 0;
+        return;
+      }
+      if(quizIndex >= active.length) quizIndex = 0;
+      if(quizIndex < 0) quizIndex = 0;
+    }
+
+    function renderQuiz(){
+      const activeData = getActiveQuizData(); // 可能是 filteredData 或只錯題子集
+      const total = activeData.length;
+
+      if(!total){
+        quizCard.innerHTML = wrongOnlyMode
+          ? `<div class="empty"><h3>目前沒有錯題可練習</h3></div>`
+          : `<div class="empty"><h3>沒有符合條件的資料</h3></div>`;
+        quizCountPill.textContent = `0 / 0`;
+        updateWrongUI();
+        return;
+      }
+
+      // 保險：避免索引超界
+      if(quizIndex >= total) quizIndex = 0;
+      if(quizIndex < 0) quizIndex = 0;
+
+      const d = activeData[quizIndex];
+      quizCountPill.textContent = `${quizIndex + 1} / ${total}`;
+      updateWrongUI();
+
+      const zhPool = allData.map(x => x.zh).filter(Boolean);
+      const wordPool = allData.map(x => x.word).filter(Boolean);
+
+      const q1Answer = d.zh || "-";
+      const q1Options = ensureOptions(
+        shuffle([q1Answer, ...sampleWrong(zhPool, q1Answer, 3)]),
+        q1Answer
+      );
+
+      const q2Answer = d.word || "-";
+      const q2Stem = maskWordInSentence(d.example_en || "-", d.word || "");
+      const q2Options = ensureOptions(
+        shuffle([q2Answer, ...sampleWrong(wordPool, q2Answer, 3)]),
+        q2Answer
+      );
+
+      const q3Answer = d.answer || "-";
+      const q3Stem = maskWordInSentence(d.reading_en || "-", d.answer || "");
+      const q3Options = ensureOptions(
+        shuffle([q3Answer, ...sampleWrong(wordPool, q3Answer, 3)]),
+        q3Answer
+      );
+
+      const { q1: showQ1, q2: showQ2, q3: showQ3 } = getQuizTypeState();
+
+      quizCard.innerHTML = "";
+
+      if(!showQ1 && !showQ2 && !showQ3){
+        quizCard.innerHTML = `<div class="empty"><h3>請至少勾選一種題型（Q1 / Q2 / Q3）</h3></div>`;
+        return;
+      }
+
+      if(showQ1){
+        renderQuestion({
+          container: quizCard,
+          qid: "q1",
+          title: "Q1. 字義選擇",
+          stem: `單字：${d.word || "-"}`,
+          options: q1Options,
+          answer: q1Answer,
+          wordKey: d.word || ""
+        }); 
+      }
+
+      if(showQ2){
+        renderQuestion({
+          container: quizCard,
+          qid: "q2",
+          title: "Q2. 選最合適的單字填入例句",
+          stem: q2Stem,
+          options: q2Options,
+          answer: q2Answer,
+          wordKey: d.word || ""
+        });
+      }
+
+      if(showQ3){
+        renderQuestion({
+          container: quizCard,
+          qid: "q3",
+          title: "Q3. 短文閱讀理解",
+          stem: q3Stem,
+          options: q3Options,
+          answer: q3Answer,
+          wordKey: d.word || ""
+        });
+      }
+    }
+
+
+    quizIndex = 0;
+    function renderFlashcard(){
+      const total = filteredData.length;
+      if(!total){
+        flashCard.innerHTML = `<div class="empty"><h3>沒有符合條件的資料</h3></div>`;
+        countPill.textContent = `0 / 0`;
+        filterStat.textContent = "0 筆";
+        return;
+      }
+
+      const d = filteredData[currentIndex];
+      const showZh = true; // PATCH: 上方全域開關移除，其他中文內容維持顯示
+
+      countPill.textContent = `${currentIndex + 1} / ${total}`;
+      filterStat.textContent = `${total} 筆`;
+
+      flashCard.innerHTML = `
+        <div class="fc-head">
+          <div>
+            <div class="word">${d.word || ""}</div>
+            ${showZh ? `<div class="zh">${d.zh || ""}</div>` : ``}
+            <div class="tiny">US ${d.ipa_us || ""}</div>
+          </div>
+          <div><div class="tiny">Level</div><div style="font-weight:900;font-size:28px;">${d.level || "-"}</div></div>
+          <div><div class="tiny">詞性</div><div style="font-weight:900;font-size:28px;">${d.pos || "-"}</div></div>
+          <button id="speakBtn" class="ghost">🔊 發音</button>
+          <div class="row" style="justify-content:flex-end;">
+            <button id="prevBtn">上一個</button>
+            <button id="nextBtn" class="primary">下一個</button>
+          </div>
+        </div>
+
+        <div class="box" style="margin-top:10px;">
+          <div class="tiny">Morpheme Highlight</div>
+          <div class="text">
+            <span class="pill">Prefix: ${d.prefix || "-"}</span>
+            <span class="pill">Root: ${d.root || "-"}</span>
+            <span class="pill">Suffix: ${d.suffix || "-"}</span>
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:10px;">
+      <div class="box">
+        <h4>例句與延伸</h4>
+
+        <p class="text ex-card">
+          <b>Examples</b><br>
+          ${d.example_en || "-"}
+          ${showZh ? `<br><b>例句翻譯</b><br>${d.example_zh || "-"}` : ``}
+        </p>
+
+        <p class="text"><b>常見搭配詞</b><br>${d.collocation || "-"}</p>
+        ${showZh ? `<p class="text"><b>同源字</b><br>${d.cognate_extension_zh || "-"}</p>` : ``}
+        ${showZh ? `<p class="text"><b>詞性延伸</b><br>${d.word_family_zh || "-"}</p>` : ``}
+      </div>
+
+          <div class="box">
+            <h4>詞源解析</h4>
+            <p class="text"><b>Prefix</b>: ${d.prefix || "-"} / ${d.prefix_meaning || "-"} ${showZh ? `（${d.prefix_meaning_zh || "-"}）` : ""}</p>
+            <p class="text"><b>Root</b>: ${d.root || "-"} / ${d.root_meaning || "-"} ${showZh ? `（${d.root_meaning_zh || "-"}）` : ""}</p>
+            <p class="text"><b>Suffix</b>: ${d.suffix || "-"} / ${d.suffix_meaning || "-"}</p>
+            ${showZh ? `<p class="text"><b>字源字義</b>：${d.literal_imagery_zh || "-"}</p>` : ``}
+            ${showZh ? `<p class="text"><b>引申字義</b>：${d.meaning_association_zh || "-"}</p>` : ``}
+            ${showZh ? `<p class="text"><b>常見用法</b>：${d.usage_note_zh || "-"}</p>` : ``}
+          </div>
+        </div>
+
+        <div class="reading">
+          <div class="reading-head">
+            <h3>閱讀短文</h3>
+            <button type="button" class="ghost toggle-zh-btn">展開中文翻譯</button>
+          </div>
+          <p>${d.reading_en || "-"}</p>
+          <p class="zh-reading is-collapsed">${d.reading_zh || "-"}</p>
+        </div>
+      `;
+
+      document.getElementById("prevBtn").onclick = () => {
+        currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length;
+        renderFlashcard();
+        if(autoSpeakToggle.checked) speakCurrent();
+      };
+      document.getElementById("nextBtn").onclick = () => {
+        currentIndex = (currentIndex + 1) % filteredData.length;
+        renderFlashcard();
+        if(autoSpeakToggle.checked) speakCurrent();
+      };
+      document.getElementById("speakBtn").onclick = speakCurrent;
+    }
+
+    csvFile.addEventListener("change", ()=>{
+      const f = csvFile.files?.[0];
+      fileName.textContent = f ? f.name : "尚未選擇檔案";
+      importBtn.disabled = !f;
+    });
+
+    importBtn.addEventListener("click", async ()=>{
+      const f = csvFile.files?.[0];
+      if(!f) return alert("請先選擇檔案");
+
+      const text = await f.text();
+      const { rows, delimiter } = parseDelimited(text);
+      if(!rows.length) return alert("檔案為空");
+
+      allData = mapRowsToObjects(rows);
+      filteredData = [...allData];
+      currentIndex = 0;
+      quizIndex = 0; // 測驗模式索引初始化
+      resetQuizRandomOrder(currentIndex);
+
+      buildFilters();
+      filterBar.classList.remove("hidden");
+      emptyState.classList.add("hidden");
+      flashSection.classList.remove("hidden");
+      quizTabBtn.disabled = false;
+
+      meta.innerHTML = `狀態：<span class="ok">已載入</span> ${allData.length} 筆資料（分隔符：${delimiter === "\t" ? "Tab" : "Comma"}）`;
+      renderFlashcard();
+      if(autoSpeakToggle.checked) speakCurrent();
+    });
+
+    searchInput.addEventListener("input", ()=>applyFilters(true));
+    levelFilter.addEventListener("change", ()=>applyFilters(true));
+    unitFilter.addEventListener("change", ()=>applyFilters(true));
+
+    clearFilterBtn.addEventListener("click", ()=>{
+      // 依你需求：清除篩選後保留目前單字位置（以單字字串回找）
+      const keepWord = filteredData[currentIndex]?.word || null;
+      searchInput.value = "";
+      levelFilter.value = "all";
+      unitFilter.value = "all";
+      filteredData = [...allData];
+      if(keepWord){
+        const idx = filteredData.findIndex(d => d.word === keepWord);
+        currentIndex = idx >= 0 ? idx : 0;
+      }
+      quizIndex = currentIndex;   // 清除篩選後測驗也對齊
+      resetQuizRandomOrder(currentIndex);
+      renderFlashcard();
+    });
+
+    rateRange.addEventListener("input", ()=>{
+      rateText.textContent = `${Number(rateRange.value).toFixed(1)}x`;
+    });
+
+    resetRateBtn.addEventListener("click", ()=>{
+      rateRange.value = "1.0";
+      rateText.textContent = "1.0x";
+    });
+
+    flashTabBtn.addEventListener("click", ()=>{
+      flashTabBtn.classList.add("active");
+      quizTabBtn.classList.remove("active");
+      flashSection.classList.remove("hidden");
+      quizSection.classList.add("hidden");
+    });
+
+    quizTabBtn.addEventListener("click", ()=>{
+      quizTabBtn.classList.add("active");
+      flashTabBtn.classList.remove("active");
+      quizSection.classList.remove("hidden");
+      flashSection.classList.add("hidden");
+      quizIndex = currentIndex; // ← 新增：對齊目前單字
+      renderQuiz();
+    });
+
+    quizPrevBtn.addEventListener("click", ()=>{
+      const active = getActiveQuizData();
+      if(!active.length) return;
+      quizIndex = (quizIndex - 1 + active.length) % active.length;
+      renderQuiz();
+    });
+
+    quizNextBtn.addEventListener("click", ()=>{
+      const active = getActiveQuizData();
+      if(!active.length) return;
+      quizIndex = (quizIndex + 1) % active.length;
+      renderQuiz();
+    });
+
+    quizRandomBtn.addEventListener("click", ()=>{
+      const active = getActiveQuizData();
+      if(!active.length) return;
+
+      if(active.length === 1){
+        quizIndex = 0;
+        renderQuiz();
+        return;
+      }
+
+      if(quizRandomOrder.length !== active.length || quizRandomPtr >= quizRandomOrder.length){
+        resetQuizRandomOrder(quizIndex);
+      }
+
+      quizIndex = quizRandomOrder[quizRandomPtr];
+      quizRandomPtr++;
+      renderQuiz();
+    });
+
+    [toggleQ1, toggleQ2, toggleQ3].forEach(el=>{
+      el.addEventListener("change", ()=>{
+        renderQuiz();
+      });
+    });
+
+    resetQuizTypeBtn.addEventListener("click", ()=>{
+      toggleQ1.checked = true;
+      toggleQ2.checked = true;
+      toggleQ3.checked = true;
+      renderQuiz();
+    });
+
+    wrongOnlyBtn.addEventListener("click", ()=>{
+      // 若沒有錯題，不能開
+      if(!wrongOnlyMode && wrongSet.size === 0){
+        alert("目前還沒有錯題可練習");
+        return;
+      }
+
+      wrongOnlyMode = !wrongOnlyMode;
+      quizIndex = 0;
+      resetQuizRandomOrder(quizIndex);
+      updateWrongUI();
+      renderQuiz();
+    });
+
+    resetWrongBtn.addEventListener("click", ()=>{
+      wrongSet.clear();
+      // 若正在錯題模式，清空後自動關閉
+      if(wrongOnlyMode) wrongOnlyMode = false;
+      quizIndex = 0;
+      resetQuizRandomOrder(quizIndex);
+      updateWrongUI();
+      renderQuiz();
+    });
+
+    // 預設：匯入前隱藏篩選列
+    filterBar.classList.add("hidden");
+    // --- PATCH: 每張閱讀卡獨立展開/收合中文翻譯（事件委派） ---
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".toggle-zh-btn");
+      if(!btn) return;
+
+      const readingBox = btn.closest(".reading");
+      if(!readingBox) return;
+
+      const zh = readingBox.querySelector(".zh-reading");
+      if(!zh) return;
+
+      const collapsed = zh.classList.contains("is-collapsed");
+      if(collapsed){
+        zh.classList.remove("is-collapsed");
+        btn.textContent = "收合中文翻譯";
+      }else{
+        zh.classList.add("is-collapsed");
+        btn.textContent = "展開中文翻譯";
+      }
+    });
+    updateWrongUI();
+  </script>
+</body>
+</html>
