@@ -579,6 +579,8 @@
       <option value="christina">Christina</option>
     </select>
     <span id="syncState" class="meta">Sync: idle</span>
+    <span id="wrongStat" class="meta">Wrong: 0</span>
+    <span id="starStat" class="meta">Starred: 0</span>
         </div>
       </div>
 
@@ -605,7 +607,13 @@
 
           <span class="label">Unit 首字母</span>
           <select id="unitFilter"><option value="all">全部</option></select>
-
+  
+          <span class="label">練習集合</span>
+          <select id="studySetFilter">
+            <option value="all">全部</option>
+            <option value="wrong">只看錯題</option>
+            <option value="starred">只看星星</option>
+          </select>
           <button id="clearFilterBtn" class="ghost">清除篩選</button>
         </div>
       </div>
@@ -730,6 +738,9 @@
 
     const userSelect = document.getElementById("userSelect");
     const syncState = document.getElementById("syncState");
+    const wrongStat = document.getElementById("wrongStat");
+    const starStat = document.getElementById("starStat");
+    const studySetFilter = document.getElementById("studySetFilter");
 
     function setSyncState(msg){
       if(syncState) syncState.textContent = `Sync: ${msg}`;
@@ -778,48 +789,81 @@
 
 
     async function saveProgressToCloud(userId){
-      const body = {
-        action: "saveProgress",
-        userId: String(userId).toLowerCase(),
-        wrongWords: [...wrongSet],
-        starredWords: [...starredSet],
+      const uid = String(userId).toLowerCase();
+
+      // WrongBook: 累積
+      const bodyWrong = {
+        action: "saveWrongBook",
+        userId: uid,
+        words: [...wrongSet],
         updatedAt: Date.now()
       };
-
-      const res = await fetch(WEB_APP_URL, {
+      const resWrong = await fetch(WEB_APP_URL, {
         method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS 相容
-        body: JSON.stringify(body)
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(bodyWrong)
       });
+      if(!resWrong.ok) throw new Error(`saveWrongBook HTTP ${resWrong.status}`);
+      const dataWrong = await resWrong.json().catch(() => ({ ok:true }));
+      if(dataWrong.ok === false) throw new Error(dataWrong.error || "saveWrongBook failed");
 
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const data = await res.json().catch(() => ({ ok:true }));
-      if(data.ok === false) throw new Error(data.error || "Cloud save failed");
+      // StarredList: 覆蓋
+      const bodyStar = {
+        action: "saveStarredList",
+        userId: uid,
+        words: [...starredSet],
+        updatedAt: Date.now()
+      };
+      const resStar = await fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(bodyStar)
+      });
+      if(!resStar.ok) throw new Error(`saveStarredList HTTP ${resStar.status}`);
+      const dataStar = await resStar.json().catch(() => ({ ok:true }));
+      if(dataStar.ok === false) throw new Error(dataStar.error || "saveStarredList failed");
     }
+
 
     async function loadProgressFromCloud(userId){
-      const body = {
-        action: "loadProgress",
-        userId: String(userId).toLowerCase()
-      };
+      const uid = String(userId).toLowerCase();
 
-      const res = await fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS 相容
-        body: JSON.stringify(body)
-      });
+      const [resWrong, resStar] = await Promise.all([
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action:"loadWrongBook", userId: uid })
+    }),
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action:"loadStarredList", userId: uid })
+    })
+  ]);
 
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      if(!resWrong.ok) throw new Error(`loadWrongBook HTTP ${resWrong.status}`);
+      if(!resStar.ok) throw new Error(`loadStarredList HTTP ${resStar.status}`);
 
-      const data = await res.json();
+      const wrongData = await resWrong.json();
+      const starData  = await resStar.json();
+
+      const wrongWords = Array.isArray(wrongData.words)
+        ? wrongData.words
+        : Array.isArray(wrongData.records)
+          ? wrongData.records.map(x => x.word).filter(Boolean)
+          : [];
+
+      const starredWords = Array.isArray(starData.words) ? starData.words : [];
+
       return {
-        wrongWords: Array.isArray(data.wrongWords) ? data.wrongWords : [],
-        starredWords: Array.isArray(data.starredWords) ? data.starredWords : [],
-        updatedAt: Number(data.updatedAt) || 0
+        wrongWords,
+        starredWords,
+        updatedAt: Math.max(
+          Number(wrongData.updatedAt) || 0,
+          Number(starData.updatedAt) || 0
+        )
       };
     }
-
 
 
     let saveTimer = null;
@@ -880,9 +924,8 @@
           saveProgressToLocal(currentUserId);
           setSyncState("cloud newer → applied");
         }else if(localTs > cloudTs){
-          // Local 較新：推回 cloud
-          await saveProgressToCloud(currentUserId);
-          setSyncState("local newer → pushed");
+          // WrongBook 是累積語義，避免切換使用者時重複加總
+          setSyncState("local newer (defer push)");
         }else{
           // 時間相同：不動資料
           setSyncState("in sync");
@@ -964,6 +1007,7 @@
       const q = searchInput.value.trim().toLowerCase();
       const lv = levelFilter.value;
       const uv = unitFilter.value;
+      const sf = studySetFilter ? studySetFilter.value : "all";
 
       const currentWord = keepCurrentWord && filteredData[currentIndex] ? filteredData[currentIndex].word : null;
 
@@ -972,10 +1016,16 @@
           d.word,d.zh,d.prefix,d.root,d.suffix,d.example_en,d.example_zh,d.reading_en,d.reading_zh
         ].join(" ").toLowerCase();
 
-        const hitQ = !q || text.includes(q); // 不做多關鍵字 AND（依你需求）
+        const hitQ = !q || text.includes(q);
         const hitL = lv === "all" || d.level === lv;
         const hitU = uv === "all" || (d.unit||"").charAt(0).toUpperCase() === uv;
-        return hitQ && hitL && hitU;
+        const hitS =
+          sf === "all" ? true :
+          sf === "wrong" ? wrongSet.has(d.word) :
+          sf === "starred" ? starredSet.has(d.word) :
+          true;
+
+        return hitQ && hitL && hitU && hitS;
       });
 
       if(currentWord){
@@ -986,6 +1036,7 @@
       quizIndex = currentIndex;    // 直接同步到同一字
       resetQuizRandomOrder(currentIndex);
       renderFlashcard();
+      if(!quizSection.classList.contains("hidden")) renderQuiz();
     }
 
     function speakCurrent(){
@@ -1066,7 +1117,10 @@
       if(!ok && wordKey){
         wrongSet.add(wordKey);
         updateWrongUI();
-        scheduleSaveProgress(); // ✅ 新增
+        if(studySetFilter && studySetFilter.value !== "all"){
+          applyFilters(true);
+        }
+      scheduleSaveProgress(); // ✅ 新增
       }
 
           btns.forEach(b=>{
@@ -1103,7 +1157,10 @@
     function updateWrongUI(){
       if(wrongCountText) wrongCountText.textContent = String(wrongSet.size);
       if(wrongOnlyBtn) wrongOnlyBtn.textContent = `只練錯題：${wrongOnlyMode ? "開" : "關"}`;
+      if(wrongStat) wrongStat.textContent = `Wrong: ${wrongSet.size}`;
+      if(starStat) starStat.textContent = `Starred: ${starredSet.size}`;
     }
+
 
     function syncQuizIndexWithActivePool(){
       const active = getActiveQuizData();
@@ -1311,11 +1368,16 @@
       const w = d.word;
       if(!w) return;
 
-     if(starredSet.has(w)) starredSet.delete(w);
+      if(starredSet.has(w)) starredSet.delete(w);
       else starredSet.add(w);
 
+      updateWrongUI();
+      if(studySetFilter && studySetFilter.value !== "all"){
+        applyFilters(true);
+      } else {
+        renderFlashcard(); // 更新按鈕文字（☆/⭐）
+      }
       scheduleSaveProgress(); // ✅ 新增
-      renderFlashcard(); // 更新按鈕文字（☆/⭐）
     };
     } // ✅ 這個是 renderFlashcard() 的結尾
 
@@ -1393,18 +1455,19 @@
         saveTimer = null;
       }
 
-      // 先保存舊 user
+      // 先保存舊 user（只存本機，避免 WrongBook 累積重複）
       saveProgressToLocal(currentUserId);
-      try{ await saveProgressToCloud(currentUserId); }catch{}
 
       // 再載入新 user
       await applyUserProgress(userSelect.value);
+
     });
 
 
     searchInput.addEventListener("input", ()=>applyFilters(true));
     levelFilter.addEventListener("change", ()=>applyFilters(true));
     unitFilter.addEventListener("change", ()=>applyFilters(true));
+    studySetFilter.addEventListener("change", ()=>applyFilters(true));
 
     clearFilterBtn.addEventListener("click", ()=>{
       // 依你需求：清除篩選後保留目前單字位置（以單字字串回找）
@@ -1412,6 +1475,7 @@
       searchInput.value = "";
       levelFilter.value = "all";
       unitFilter.value = "all";
+      if(studySetFilter) studySetFilter.value = "all";
       filteredData = [...allData];
       if(keepWord){
         const idx = filteredData.findIndex(d => d.word === keepWord);
@@ -1514,8 +1578,12 @@
       quizIndex = 0;
       resetQuizRandomOrder(quizIndex);
       updateWrongUI();
+      if(studySetFilter && studySetFilter.value !== "all"){
+        applyFilters(true);
+      }
       scheduleSaveProgress(); // ✅ 新增
       renderQuiz();
+
     });
 
     // 預設：匯入前隱藏篩選列
@@ -1557,4 +1625,5 @@
   </script>
 </body>
 </html>
+
 
