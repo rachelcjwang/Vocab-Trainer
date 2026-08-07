@@ -114,8 +114,8 @@
     }
 
     .word{ font-size:40px; font-weight:900; line-height:1.05; }
-    .zh{ font-size:20px; font-weight:900; color:#1f345f; margin-top:2px; }
-    .tiny{ font-size:12px; color:#64748b; font-weight:800; }
+    .zh{ font-size:20px; font-weight:900; color:#1f345f; margin-top:3px; }
+    .tiny{ font-size:16px; color:#64748b; font-weight:800; margin-top:3px; }
 
     .pill{
       display:inline-flex; align-items:center; border:1px solid #d5e2fb; background:#f2f7ff;
@@ -466,12 +466,14 @@
       font-size:13px;
       font-weight:800;
     }
-    /* ===== Stable Flashcard Header Patch (no nth-child dependency) ===== */
+
+  /* ===== Flashcard Header Pixel-Perfect Final ===== */
 .fc-head{
   display:grid;
-  grid-template-columns:minmax(260px,1.6fr) 90px 170px auto;
+  /* 左主區 + Level + 詞性 + 右按鈕群 */
+  grid-template-columns:minmax(280px,1.7fr) 52px 170px auto;
   gap:10px;
-  align-items:stretch;
+  align-items:center;
   border-top:1px solid #e9efff;
   padding-top:8px;
   margin-top:8px;
@@ -481,71 +483,120 @@
   display:flex;
   flex-direction:column;
   justify-content:center;
+  min-height:48px;                  /* 與右側元件同基準 */
 }
 
+/* Level / 詞性 卡 */
 .fc-meta{
+  height:48px;
+  min-height:48px;
   border:1px solid #dbe6fb;
   border-radius:10px;
   background:linear-gradient(180deg,#ffffff 0%,#f9fcff 100%);
-  padding:8px 10px;  /* 內距變小 */
-  min-height:52px;
+  padding:0 10px;            
   display:flex;
   flex-direction:column;
   justify-content:center;
-  box-shadow:0 2px 8px rgba(37,99,235,.06);
+  gap:0px;
+  box-shadow:0 1px 4px rgba(37,99,235,.05);
 }
-.fc-meta .tiny{
-  margin-bottom:4px;
-  font-size:16px;
+
+/* 標籤：Level / 詞性 */
+.fc-head .fc-meta .tiny{
+  display:none !important;   /* 隱藏 Level / 詞性 標題 */
 }
+
+/* 值：1 / art. */
 .fc-meta-value{
-  font-weight:600;
+  margin:0;
   font-size:20px;
-  line-height:1.05;
+  font-weight:600;
+  line-height:1;
+  letter-spacing:0;
   color:#0f1f44;
 }
 
-/* 四顆按鈕放在同一組 */
+/* 右側四顆按鈕區 */
 .fc-actions{
   display:flex;
   align-items:center;
   justify-content:flex-end;
   gap:8px;
   flex-wrap:nowrap;
+  min-height:48px;
 }
 
-/* 只放大 flashcard header 這四顆，不影響全站其他按鈕 */
+/* 只控制這四顆 */
 .fc-actions > button{
-  min-height:42px;
-  min-width:96px;
-  padding:7px 14px;
+  height:48px;                      /* 改用固定 height，最穩 */
+  min-height:48px;
+  padding:0 16px;                   /* 垂直由高度控制，避免 baseline 漂移 */
   border-radius:10px;
   font-size:18px;
-  font-weight:600;
+  font-weight:700;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
+
+/* 收藏按鈕稍寬，避免換行 */
 .fc-actions > #starBtn{
-  min-width:112px;
+  min-width:108px;
   white-space:nowrap;
 }
 
-/* 手機：不改其他 layout，只讓這塊穩定換行 */
+/* 其餘按鈕寬度基準 */
+.fc-actions > #speakBtn{ min-width:88px; }
+.fc-actions > #prevBtn,
+.fc-actions > #nextBtn{ min-width:88px; }
+
+/* ===== Mobile ===== */
 @media (max-width:900px){
   .fc-head{
     grid-template-columns:1fr 1fr;
+    gap:8px;
   }
+
+.fc-head .fc-meta .tiny{
+  display:none !important;
+}
+
   .fc-main{
     grid-column:1 / -1;
+    min-height:auto;
   }
+
   .fc-actions{
     grid-column:1 / -1;
     justify-content:flex-start;
     flex-wrap:wrap;
+    gap:8px;
   }
+
   .fc-actions > button{
     flex:1 1 calc(50% - 8px);
-    min-width:unset;
+    min-width:unset !important;
+    height:42px;
+    min-height:42px;
+    font-size:16px;
+  }
+
+  .fc-meta{
+    height:42px;
+    min-height:42px;
+    padding:4px 9px 3px;
+  }
+
+  .fc-meta .tiny{
+    font-size:11px;
+  }
+
+  .fc-meta-value{
+    font-size:16px;
   }
 }
+
 
   </style>
 </head>
@@ -576,8 +627,7 @@
     <select id="userSelect">
       <option value="jocelyn">Jocelyn</option>
       <option value="christina">Christina</option>
-	  <option value="rachel">rachel</option>
-		
+      <option value="rachel">Rachel</option>
     </select>
     <span id="syncState" class="meta">Sync: idle</span>
     <span id="wrongStat" class="meta">Wrong: 0</span>
@@ -688,7 +738,6 @@
       "reading_en","answer","reading_zh"
     ];
 
-    const MASTER_CSV_URL = "https://docs.google.com/spreadsheets/d/1dlRL9EJtQDWokbiXBseCi82hn4Hr8cFYGAYos-e-SI8/export?format=csv&gid=1012776618";
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx7CElIMwA7squaZC9qh63vypFwZe6cD--exs8BIAMC1DkvkeeciueIYOOZZKrPP4MD/exec";
 
 
@@ -945,9 +994,12 @@
       starredSet = new Set([...starredSet].filter(w => validWords.has(w)));
     }
 
-
     function parseDelimited(text){
-      const firstLine = text.split(/\r?\n/).find(Boolean) || "";
+      // 1) Normalize line endings: CRLF / CR -> LF
+      text = String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+      // 2) Auto-detect delimiter from first non-empty line
+      const firstLine = text.split("\n").find(line => line.trim().length > 0) || "";
       const tabCount = (firstLine.match(/\t/g) || []).length;
       const commaCount = (firstLine.match(/,/g) || []).length;
       const delimiter = tabCount > commaCount ? "\t" : ",";
@@ -957,29 +1009,245 @@
       let cell = "";
       let inQuotes = false;
 
-      for(let i=0;i<text.length;i++){
+      for(let i = 0; i < text.length; i++){
         const ch = text[i];
-        const next = text[i+1];
+        const next = text[i + 1];
 
         if(ch === '"'){
-          if(inQuotes && next === '"'){ cell += '"'; i++; }
-          else inQuotes = !inQuotes;
-        }else if(ch === delimiter && !inQuotes){
-          row.push(cell); cell = "";
-        }else if((ch === "\n" || ch === "\r") && !inQuotes){
-          if(ch === "\r" && next === "\n") i++;
+          if(inQuotes && next === '"'){
+            // Escaped quote inside quoted field
+            cell += '"';
+            i++;
+          }else{
+            // Enter/exit quoted mode
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+
+        if(ch === delimiter && !inQuotes){
           row.push(cell);
-          if(row.some(v => v !== "")) rows.push(row);
-          row = []; cell = "";
-        }else cell += ch;
+          cell = "";
+          continue;
+        }
+
+        if(ch === "\n" && !inQuotes){
+          row.push(cell);
+
+          // keep non-empty rows (same behavior as your old code)
+          if(row.some(v => v !== "")){
+            rows.push(row);
+          }
+
+          row = [];
+          cell = "";
+          continue;
+        }
+
+        cell += ch;
       }
-      if(cell.length || row.length){
+
+      // 3) Flush tail
+      if(cell.length > 0 || row.length > 0){
         row.push(cell);
-        if(row.some(v => v !== "")) rows.push(row);
+        if(row.some(v => v !== "")){
+          rows.push(row);
+        }
       }
+
       return { rows, delimiter };
     }
 
+    function rowsObjectsTo2DRows(rowsObj, header){
+      const h = (header || []).map(x => String(x || "").trim());
+      const rows = [h];
+      for(const obj of (rowsObj || [])){
+        rows.push(h.map(col => (obj && obj[col] != null) ? String(obj[col]) : ""));
+      }
+      return rows;
+    }
+
+// ===== Master cache helpers =====
+const MASTER_CACHE_KEY_PREFIX = "vtp_master_cache_v1";
+
+function getMasterCacheKey(userId){
+  return `${MASTER_CACHE_KEY_PREFIX}:${String(userId || "rachel").toLowerCase()}`;
+}
+
+function saveMasterCache(userId, payload){
+  try{
+    const key = getMasterCacheKey(userId);
+    localStorage.setItem(key, JSON.stringify({
+      savedAt: Date.now(),
+      ...payload
+    }));
+  }catch(e){
+    console.warn("saveMasterCache failed:", e);
+  }
+}
+
+function loadMasterCache(userId){
+  try{
+    const key = getMasterCacheKey(userId);
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.rows) || !parsed.dataVersion) return null;
+    return parsed;
+  }catch(e){
+    console.warn("loadMasterCache failed:", e);
+    return null;
+  }
+}
+
+function clearMasterCache(userId){
+  try{
+    localStorage.removeItem(getMasterCacheKey(userId));
+  }catch(e){
+    console.warn("clearMasterCache failed:", e);
+  }
+}
+
+ async function loadMasterByChunks(options = {}){
+  const chunkSize = Number(options.chunkSize) || 800;
+  const userId = String(options.userId || currentUserId || "rachel").toLowerCase();
+  const ifVersion = options.ifVersion || "";
+
+  // 1) meta
+  const metaRes = await fetch(WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({
+      action: "loadMasterCsvMeta",
+      userId,
+      chunkSize
+    })
+  });
+  if(!metaRes.ok) throw new Error(`loadMasterCsvMeta HTTP ${metaRes.status}`);
+  const metaData = await metaRes.json();
+  if(!metaData.ok) throw new Error(metaData.error || "loadMasterCsvMeta failed");
+
+  const totalChunks = Number(metaData.totalChunks) || 0;
+  const finalChunkSize = Number(metaData.chunkSize) || chunkSize;
+  const dataVersion = metaData.dataVersion || "";
+  const rowCount = Number(metaData.rowCount) || 0;
+
+  // 空資料
+  if(totalChunks === 0){
+    const rows = [Array.isArray(metaData.header) ? metaData.header : []];
+    saveMasterCache(userId, {
+      dataVersion,
+      rowCount: 0,
+      totalChunks: 0,
+      chunkSize: finalChunkSize,
+      rows
+    });
+    return {
+      rows,
+      delimiter: ",",
+      rowCount: 0,
+      totalChunks: 0,
+      chunkSize: finalChunkSize,
+      dataVersion,
+      notModified: false
+    };
+  }
+
+  let header = null;
+  const allRowsObj = [];
+
+  // 2) first chunk (帶 ifVersion)
+  if(typeof options.onProgress === "function"){
+    options.onProgress(0, totalChunks);
+  }
+
+  const firstRes = await fetch(WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({
+      action: "loadMasterCsvChunk",
+      userId,
+      chunkSize: finalChunkSize,
+      chunkIndex: 0,
+      ifVersion: ifVersion || ""
+    })
+  });
+  if(!firstRes.ok) throw new Error(`loadMasterCsvChunk HTTP ${firstRes.status} @ chunk 0`);
+
+  const firstData = await firstRes.json();
+  if(!firstData.ok) throw new Error(firstData.error || "loadMasterCsvChunk failed @ chunk 0");
+
+  // 版本沒變：後端 short-circuit
+  if(firstData.notModified){
+    return {
+      rows: null,
+      delimiter: ",",
+      rowCount,
+      totalChunks,
+      chunkSize: finalChunkSize,
+      dataVersion: firstData.dataVersion || dataVersion,
+      notModified: true
+    };
+  }
+
+  header = Array.isArray(firstData.header) ? firstData.header : [];
+  if(Array.isArray(firstData.rows) && firstData.rows.length){
+    allRowsObj.push(...firstData.rows);
+  }
+
+  // 3) remaining chunks
+  for(let i = 1; i < totalChunks; i++){
+    if(typeof options.onProgress === "function"){
+      options.onProgress(i, totalChunks);
+    }
+
+    const chunkRes = await fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "loadMasterCsvChunk",
+        userId,
+        chunkSize: finalChunkSize,
+        chunkIndex: i,
+        ifVersion: ""
+      })
+    });
+
+    if(!chunkRes.ok) throw new Error(`loadMasterCsvChunk HTTP ${chunkRes.status} @ chunk ${i}`);
+    const chunkData = await chunkRes.json();
+    if(!chunkData.ok) throw new Error(chunkData.error || `loadMasterCsvChunk failed @ chunk ${i}`);
+
+    if(Array.isArray(chunkData.rows) && chunkData.rows.length){
+      allRowsObj.push(...chunkData.rows);
+    }
+  }
+
+  if(typeof options.onProgress === "function"){
+    options.onProgress(totalChunks, totalChunks);
+  }
+
+  // 4) compose + cache
+  const rows = rowsObjectsTo2DRows(allRowsObj, header);
+  saveMasterCache(userId, {
+    dataVersion,
+    rowCount,
+    totalChunks,
+    chunkSize: finalChunkSize,
+    rows
+  });
+
+  return {
+    rows,
+    delimiter: ",",
+    rowCount,
+    totalChunks,
+    chunkSize: finalChunkSize,
+    dataVersion,
+    notModified: false
+  };
+}
+
+      
     function mapRowsToObjects(rows){
       const header = rows[0].map(h => String(h).trim());
       const lower = header.map(h => h.toLowerCase());
@@ -1382,7 +1650,7 @@
     };
     } // ✅ 這個是 renderFlashcard() 的結尾
 
-    async function loadDataIntoApp(rows, sourceLabel){
+    async function loadDataIntoApp(rows, sourceLabel, options = {}){
       allData = mapRowsToObjects(rows);
       filteredData = [...allData];
       currentIndex = 0;
@@ -1400,11 +1668,22 @@
 
       meta.innerHTML = `狀態：<span class="ok">已載入</span> ${allData.length} 筆資料（來源：${sourceLabel}）`;
 
-      await applyUserProgress(currentUserId); // <- wait for local/cloud merge first
-      renderFlashcard();
+      if(options.skipProgressSync){
+        // cache-hit fast path：不等待雲端同步，先秒開畫面
+        sanitizeSetsByCurrentData();
+        updateWrongUI();
+        renderFlashcard();
+        if(!quizSection.classList.contains("hidden")) renderQuiz();
+      }else{
+        // normal path：做 local/cloud merge 後再渲染
+        await applyUserProgress(currentUserId);
+        renderFlashcard();
+        if(!quizSection.classList.contains("hidden")) renderQuiz();
+      }
 
       if(autoSpeakToggle.checked) speakCurrent();
     }
+
 
     csvFile.addEventListener("change", ()=>{
       const f = csvFile.files?.[0];
@@ -1425,32 +1704,87 @@
     });
 
 
-    loadMasterBtn.addEventListener("click", async ()=>{
-      try{
-        meta.textContent = "狀態：正在載入 Master CSV...";
-        loadMasterBtn.disabled = true;
+let isMasterLoading = false;
 
-        const res = await fetch(MASTER_CSV_URL, { method: "GET" });
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+loadMasterBtn.addEventListener("click", async ()=>{
+  if(isMasterLoading) return;
+  isMasterLoading = true;
+  loadMasterBtn.disabled = true;
 
-        const text = await res.text();
-    if (/^\s*<!doctype html/i.test(text) || /^\s*<html/i.test(text)) {
-      throw new Error("抓到的不是 CSV，請檢查 Google Sheet 分享權限（需可讀取）");
-    }
-        const { rows, delimiter } = parseDelimited(text);
-        if(!rows.length) throw new Error("Master CSV 為空");
+  const userId = String(currentUserId || "rachel").toLowerCase();
 
-        await loadDataIntoApp(rows, `Master CSV / ${delimiter === "\t" ? "Tab" : "Comma"}`);
-      }catch(err){
-        console.error(err);
-        meta.textContent = `狀態：載入 Master CSV 失敗（${err.message}）`;
-        alert(`載入 Master CSV 失敗：${err.message}`);
-      }finally{
-        loadMasterBtn.disabled = false;
+  try{
+    meta.textContent = "狀態：檢查 Master 版本中...";
+
+    const cache = loadMasterCache(userId);
+
+    const result = await loadMasterByChunks({
+      userId,
+      chunkSize: 800,
+      ifVersion: cache?.dataVersion || "",
+      onProgress: (done, total) => {
+        meta.textContent = `狀態：載入 Master 中... ${done}/${total} chunks`;
       }
     });
 
-    userSelect.addEventListener("change", async () => {
+    // 版本相同：直接用本機快取秒開
+    if(result.notModified){
+      if(cache && Array.isArray(cache.rows) && cache.rows.length > 0){
+        await loadDataIntoApp(
+          cache.rows,
+          `Master CSV(Cache Hit) / v=${cache.dataVersion} / ${cache.rowCount || Math.max(0, cache.rows.length - 1)} rows`,
+          { skipProgressSync: true }
+        );
+        meta.textContent = `狀態：Master 秒開（快取命中，v=${cache.dataVersion}）`;
+        return;
+      }
+
+      // 極少數：後端說沒變但本機沒快取，強制完整重抓
+      meta.textContent = "狀態：快取遺失，改為完整重抓...";
+      const full = await loadMasterByChunks({
+        userId,
+        chunkSize: 800,
+        ifVersion: "",
+        onProgress: (done, total) => {
+          meta.textContent = `狀態：重抓 Master 中... ${done}/${total} chunks`;
+        }
+      });
+
+      if(!full.rows || full.rows.length < 1){
+        throw new Error("Master 資料為空");
+      }
+
+      await loadDataIntoApp(full.rows, `Master CSV(API Chunk) / v=${full.dataVersion || "-"}`);
+      meta.textContent = `狀態：Master 載入完成（${full.rowCount} 筆 / ${full.totalChunks} chunks）`;
+      return;
+    }
+
+    // 有新版本：用新資料
+    if(!result.rows || result.rows.length < 1){
+      throw new Error("Master 資料為空");
+    }
+
+    await loadDataIntoApp(
+      result.rows,
+      `Master CSV(API Chunk) / ${result.totalChunks} chunks / v=${result.dataVersion || "-"}`
+    );
+    meta.textContent = `狀態：Master 載入完成（${result.rowCount} 筆 / ${result.totalChunks} chunks）`;
+
+  }catch(err){
+    console.error(err);
+    clearMasterCache(userId); // 避免壞快取殘留
+    meta.textContent = `狀態：載入 Master 失敗（${err.message}）`;
+    alert(`載入 Master CSV 失敗：${err.message}`);
+  }finally{
+    isMasterLoading = false;
+    loadMasterBtn.disabled = false;
+  }
+});
+
+
+
+
+   userSelect.addEventListener("change", async () => {
       if(saveTimer){
         clearTimeout(saveTimer);
         saveTimer = null;
