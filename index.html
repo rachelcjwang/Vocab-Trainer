@@ -1395,16 +1395,35 @@ function clearMasterCache(userId){
       quizRandomPtr = 0;
     }
 
-    function sampleWrong(pool, correct, n=3){
-      const uniq = [...new Set(pool.filter(v => v && v !== correct))];
-      return shuffle(uniq).slice(0, n);
-    }
+    function ensureOptions(options, fallback, pool=[]){
+      const out = [];
+      const seen = new Set();
+      const fb = String(fallback || "").trim();
 
-    function ensureOptions(options, fallback){
-      const out = [...options];
-      while(out.length < 4) out.push(fallback || "-");
+      for(const x of (options || [])){
+        const s = String(x || "").trim();
+        if(!s || seen.has(s)) continue;
+        seen.add(s);
+        out.push(s);
+      }
+
+      for(const x of (pool || [])){
+        const s = String(x || "").trim();
+        if(!s || s === fb || s === "-" || seen.has(s)) continue;
+        seen.add(s);
+        out.push(s);
+        if(out.length >= 4) break;
+      }
+
+      // 最後保底：重複正解，不放 "-"
+      while(out.length < 4){
+        out.push(fb || "N/A");
+      }
+
       return out.slice(0,4);
     }
+
+
     function escapeRegExp(str){
       return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
@@ -1416,15 +1435,27 @@ function clearMasterCache(userId){
       return masked === sentence ? sentence.replace(new RegExp(escapeRegExp(target), "gi"), "_____") : masked;
     }
 
+    function splitZhMeanings(zh){
+      // 支援：、，,；;/／ | 與空白
+      return [...new Set(
+        String(zh || "")
+          .split(/[、，,；;／/|]/g)
+          .map(s => s.trim())
+          .filter(Boolean)
+      )];
+    }
+
     function renderQuestion({
       container, qid, title, stem, options, answer, wordKey
     }){
+      const opts = (options || []).map(v => String(v ?? "").trim());
+
       container.insertAdjacentHTML("beforeend", `
         <div class="quiz-q" id="${qid}">
           <h4>${title}</h4>
           <p class="quiz-stem">${stem}</p>
           <div class="quiz-options">
-            ${options.map(opt => `<button class="quiz-option" data-opt="${String(opt).replace(/"/g,'&quot;')}">${opt}</button>`).join("")}
+            ${opts.map((opt, idx) => `<button class="quiz-option" data-idx="${idx}">${opt}</button>`).join("")}
           </div>
           <div class="quiz-result hidden"></div>
         </div>
@@ -1434,14 +1465,19 @@ function clearMasterCache(userId){
       const btns = [...qEl.querySelectorAll(".quiz-option")];
       const result = qEl.querySelector(".quiz-result");
 
+      const answerText = String(answer ?? "").trim();
+
       btns.forEach(btn=>{
         btn.onclick = () => {
-          const chosen = btn.getAttribute("data-opt");
-          const ok = chosen === answer;
+          const idx = Number(btn.getAttribute("data-idx"));
+          const chosen = opts[idx] || "";
+          const ok = chosen === answerText;
 
-          // ✅ 用 wordKey 記錄錯題（最穩）
           if(!ok && wordKey){
-            markWrongWord(wordKey);
+            // 用你目前版本的錯題記錄方式即可
+            if (typeof markWrongWord === "function") markWrongWord(wordKey);
+            else wrongSet.add(wordKey);
+
             updateWrongUI();
             if(studySetFilter && studySetFilter.value !== "all"){
               applyFilters(true);
@@ -1449,24 +1485,21 @@ function clearMasterCache(userId){
             scheduleSaveProgress();
           }
 
-
-          btns.forEach(b=>{
-            const v = b.getAttribute("data-opt");
+          btns.forEach((b, i)=>{
             b.disabled = true;
-            if(v === answer) b.classList.add("correct");
+            if((opts[i] || "") === answerText) b.classList.add("correct");
           });
 
-          if(!ok){
-            btn.classList.add("wrong");
-          }
+          if(!ok) btn.classList.add("wrong");
 
           result.classList.remove("hidden");
           result.innerHTML = ok
             ? `✅ 答對了`
-            : `❌ 答錯，正確答案：<b>${answer}</b>`;
+            : `❌ 答錯，正確答案：<b>${answerText}</b>`;
         };
       });
     }
+
 
     function getQuizTypeState(){
       return {
@@ -1499,6 +1532,16 @@ function clearMasterCache(userId){
       if(quizIndex < 0) quizIndex = 0;
     }
 
+    function sampleWrong(pool, correct, n=3){
+      const c = String(correct || "").trim();
+      const uniq = [...new Set(
+        (pool || [])
+          .map(v => String(v || "").trim())
+          .filter(v => v && v !== c && v !== "-")
+      )];
+      return shuffle(uniq).slice(0, n);
+    }
+
     function renderQuiz(){
       const activeData = getActiveQuizData(); // 可能是 filteredData 或只錯題子集
       const total = activeData.length;
@@ -1524,10 +1567,11 @@ function clearMasterCache(userId){
       const wordPool = allData.map(x => x.word).filter(Boolean);
       const answerPool = allData.map(x => x.answer).filter(Boolean);
 
-      const q1Answer = d.zh || "-";
+      const q1Answer = String(d.zh || "").trim() || "-";
       const q1Options = ensureOptions(
         shuffle([q1Answer, ...sampleWrong(zhPool, q1Answer, 3)]),
-        q1Answer
+        q1Answer,
+        zhPool
       );
 
       const q2Answer = d.word || "-";
