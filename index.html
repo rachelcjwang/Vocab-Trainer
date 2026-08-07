@@ -802,6 +802,9 @@
     let wrongSet = new Set();   // 記錄答錯的單字（用 word 當 key）
     let wrongOnlyMode = false;  // 是否只練錯題
     let starredSet = new Set(); // ⭐ 獨立收藏
+    
+    // --- NEW: delta buffer for wrong-book accumulate semantics ---
+    let pendingWrongDelta = new Set();   // only newly wrong words since last successful sync
     let currentUserId = (localStorage.getItem("currentUserId") || "rachel").toLowerCase();
 
 
@@ -817,6 +820,24 @@
         updatedAt: Date.now()
       };
       localStorage.setItem(key, JSON.stringify(payload));
+    }
+
+
+    function markWrongWord(word){
+      const w = String(word || "").trim();
+      if(!w) return;
+
+      // if this word is newly added to wrongSet, push to delta
+      if(!wrongSet.has(w)){
+        wrongSet.add(w);
+        pendingWrongDelta.add(w);
+      }
+    }
+
+    function flushWrongDelta(){
+      const out = [...pendingWrongDelta];
+      pendingWrongDelta.clear();
+      return out;
     }
 
     function loadProgressFromLocal(userId){
@@ -837,43 +858,69 @@
       }
     }
 
-
     async function saveProgressToCloud(userId){
       const uid = String(userId).toLowerCase();
 
-      // WrongBook: 累積
-      const bodyWrong = {
-        action: "saveWrongBook",
-        userId: uid,
-        words: [...wrongSet],
-        updatedAt: Date.now()
-      };
-      const resWrong = await fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(bodyWrong)
-      });
-      if(!resWrong.ok) throw new Error(`saveWrongBook HTTP ${resWrong.status}`);
-      const dataWrong = await resWrong.json().catch(() => ({ ok:true }));
-      if(dataWrong.ok === false) throw new Error(dataWrong.error || "saveWrongBook failed");
+      // only send newly wrong words for accumulate API semantics
+      const wrongDeltaWords = flushWrongDelta();
 
-      // StarredList: 覆蓋
-      const bodyStar = {
-        action: "saveStarredList",
+      // New unified action (preferred)
+      const bundleBody = {
+        action: "saveProgressBundle",
         userId: uid,
-        words: [...starredSet],
+        wrongDeltaWords,          // accumulate only delta
+        starredWords: [...starredSet], // overwrite full snapshot
         updatedAt: Date.now()
       };
-      const resStar = await fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(bodyStar)
-      });
-      if(!resStar.ok) throw new Error(`saveStarredList HTTP ${resStar.status}`);
-      const dataStar = await resStar.json().catch(() => ({ ok:true }));
-      if(dataStar.ok === false) throw new Error(dataStar.error || "saveStarredList failed");
+
+      try{
+        const res = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(bundleBody)
+        });
+
+        if(!res.ok) throw new Error(`saveProgressBundle HTTP ${res.status}`);
+        const data = await res.json().catch(() => ({ ok:true }));
+        if(data.ok === false) throw new Error(data.error || "saveProgressBundle failed");
+        return; // success
+      }catch(bundleErr){
+        console.warn("bundle save failed, fallback to legacy APIs:", bundleErr);
+
+        // Fallback strategy (backward compatible):
+        // 1) wrong -> send delta only (avoid over-counting)
+        if(wrongDeltaWords.length){
+          const resWrong = await fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "saveWrongBook",
+              userId: uid,
+              words: wrongDeltaWords,
+              updatedAt: Date.now()
+            })
+          });
+          if(!resWrong.ok) throw new Error(`saveWrongBook HTTP ${resWrong.status}`);
+          const dataWrong = await resWrong.json().catch(() => ({ ok:true }));
+          if(dataWrong.ok === false) throw new Error(dataWrong.error || "saveWrongBook failed");
+        }
+
+        // 2) starred overwrite
+        const resStar = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "saveStarredList",
+            userId: uid,
+            words: [...starredSet],
+            updatedAt: Date.now()
+          })
+        });
+        if(!resStar.ok) throw new Error(`saveStarredList HTTP ${resStar.status}`);
+        const dataStar = await resStar.json().catch(() => ({ ok:true }));
+        if(dataStar.ok === false) throw new Error(dataStar.error || "saveStarredList failed");
+      }
     }
-
 
     async function loadProgressFromCloud(userId){
       const uid = String(userId).toLowerCase();
@@ -945,6 +992,8 @@
       const localData = loadProgressFromLocal(currentUserId);
       wrongSet = new Set(localData.wrongWords || []);
       starredSet = new Set(localData.starredWords || []);
+      pendingWrongDelta.clear();
+
       if(allData.length) sanitizeSetsByCurrentData();
       updateWrongUI();
       if(filteredData.length){
@@ -965,6 +1014,8 @@
           // Cloud 較新：採用 cloud，回寫 local
           wrongSet = new Set(cloudData.wrongWords || []);
           starredSet = new Set(cloudData.starredWords || []);
+          pendingWrongDelta.clear();
+
           if(allData.length) sanitizeSetsByCurrentData();
           updateWrongUI();
           if(filteredData.length){
@@ -975,13 +1026,19 @@
           setSyncState("cloud newer → applied");
         }else if(localTs > cloudTs){
           // WrongBook 是累積語義，避免切換使用者時重複加總
+          // optional defensive clear:
+          pendingWrongDelta.clear();
           setSyncState("local newer (defer push)");
         }else{
           // 時間相同：不動資料
+          // optional defensive clear:
+          pendingWrongDelta.clear();
           setSyncState("in sync");
         }
       }catch(err){
         console.warn("Cloud load failed:", err);
+        // optional defensive clear:
+        pendingWrongDelta.clear();
         setSyncState("cloud load failed (using local)");
       }
     }
@@ -1383,14 +1440,15 @@ function clearMasterCache(userId){
           const ok = chosen === answer;
 
           // ✅ 用 wordKey 記錄錯題（最穩）
-      if(!ok && wordKey){
-        wrongSet.add(wordKey);
-        updateWrongUI();
-        if(studySetFilter && studySetFilter.value !== "all"){
-          applyFilters(true);
-        }
-      scheduleSaveProgress(); // ✅ 新增
-      }
+          if(!ok && wordKey){
+            markWrongWord(wordKey);
+            updateWrongUI();
+            if(studySetFilter && studySetFilter.value !== "all"){
+              applyFilters(true);
+            }
+            scheduleSaveProgress();
+          }
+
 
           btns.forEach(b=>{
             const v = b.getAttribute("data-opt");
@@ -1464,6 +1522,7 @@ function clearMasterCache(userId){
 
       const zhPool = allData.map(x => x.zh).filter(Boolean);
       const wordPool = allData.map(x => x.word).filter(Boolean);
+      const answerPool = allData.map(x => x.answer).filter(Boolean);
 
       const q1Answer = d.zh || "-";
       const q1Options = ensureOptions(
@@ -1481,7 +1540,7 @@ function clearMasterCache(userId){
       const q3Answer = d.answer || "-";
       const q3Stem = maskWordInSentence(d.reading_en || "-", d.answer || "");
       const q3Options = ensureOptions(
-        shuffle([q3Answer, ...sampleWrong(wordPool, q3Answer, 3)]),
+        shuffle([q3Answer, ...sampleWrong(answerPool, q3Answer, 3)]),
         q3Answer
       );
 
@@ -1908,6 +1967,7 @@ loadMasterBtn.addEventListener("click", async ()=>{
 
     resetWrongBtn.addEventListener("click", ()=>{
       wrongSet.clear();
+      pendingWrongDelta.clear();
       // 若正在錯題模式，清空後自動關閉
       if(wrongOnlyMode) wrongOnlyMode = false;
       quizIndex = 0;
