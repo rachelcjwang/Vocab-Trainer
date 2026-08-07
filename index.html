@@ -113,12 +113,8 @@
       font-size:12px; color:#4d5f80; font-weight:700;
     }
 
-    .fc-head{
-      display:grid; grid-template-columns: 1.5fr .6fr .6fr auto auto; gap:10px; align-items:center;
-      border-top:1px solid #e9efff; padding-top:10px; margin-top:8px;
-    }
     .word{ font-size:40px; font-weight:900; line-height:1.05; }
-    .zh{ font-size:30px; font-weight:900; color:#1f345f; margin-top:2px; }
+    .zh{ font-size:20px; font-weight:900; color:#1f345f; margin-top:2px; }
     .tiny{ font-size:12px; color:#64748b; font-weight:800; }
 
     .pill{
@@ -149,7 +145,7 @@
       .fc-head{ grid-template-columns:1fr 1fr; }
       .grid2{ grid-template-columns:1fr; }
       .word{ font-size:32px; }
-      .zh{ font-size:24px; }
+      .zh{ font-size:20px; }
     }
     /* --- PATCH: Reading header with right-top toggle button --- */
     .reading-head{
@@ -470,14 +466,95 @@
       font-size:13px;
       font-weight:800;
     }
+    /* ===== Stable Flashcard Header Patch (no nth-child dependency) ===== */
+.fc-head{
+  display:grid;
+  grid-template-columns:minmax(260px,1.6fr) 90px 170px auto;
+  gap:10px;
+  align-items:stretch;
+  border-top:1px solid #e9efff;
+  padding-top:8px;
+  margin-top:8px;
+}
+
+.fc-main{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.fc-meta{
+  border:1px solid #dbe6fb;
+  border-radius:10px;
+  background:linear-gradient(180deg,#ffffff 0%,#f9fcff 100%);
+  padding:8px 10px;  /* 內距變小 */
+  min-height:52px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  box-shadow:0 2px 8px rgba(37,99,235,.06);
+}
+.fc-meta .tiny{
+  margin-bottom:4px;
+  font-size:16px;
+}
+.fc-meta-value{
+  font-weight:600;
+  font-size:20px;
+  line-height:1.05;
+  color:#0f1f44;
+}
+
+/* 四顆按鈕放在同一組 */
+.fc-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:nowrap;
+}
+
+/* 只放大 flashcard header 這四顆，不影響全站其他按鈕 */
+.fc-actions > button{
+  min-height:42px;
+  min-width:96px;
+  padding:7px 14px;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:600;
+}
+.fc-actions > #starBtn{
+  min-width:112px;
+  white-space:nowrap;
+}
+
+/* 手機：不改其他 layout，只讓這塊穩定換行 */
+@media (max-width:900px){
+  .fc-head{
+    grid-template-columns:1fr 1fr;
+  }
+  .fc-main{
+    grid-column:1 / -1;
+  }
+  .fc-actions{
+    grid-column:1 / -1;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+  .fc-actions > button{
+    flex:1 1 calc(50% - 8px);
+    min-width:unset;
+  }
+}
+
   </style>
 </head>
 <body>
   <main class="container">
     <section class="hero card">
       <h1>🚀 Vocabulary Trainer Pro</h1>
-      <p>上傳 CSV，今天多一點，明天會感謝現在努力的自己。</p>
-      <span class="tip">😎 單字不會背叛你，除非你先跳過它。</span>
+      <p>今天背一點，明天會感謝現在努力的自己。</p>
+      <span class="tip">😎 單字不會背叛你，但是我會!!!HA。</span>
     </section>
 
     <section class="card">
@@ -488,11 +565,20 @@
           <span id="fileName" class="file-name">尚未選擇檔案</span>
 
           <button id="importBtn" class="primary" disabled>匯入 CSV</button>
+	  <button id="loadMasterBtn" class="ghost">載入 Master CSV</button>
 
           <div class="tabs">
             <button id="flashTabBtn" class="tab active">閃卡模式</button>
             <button id="quizTabBtn" class="tab" disabled>測驗模式</button>
           </div>
+
+    <span class="label" style="margin-left:12px;">使用者</span>
+    <select id="userSelect">
+      <option value="rachel">Rachel</option>
+      <option value="jocelyn">Jocelyn</option>
+      <option value="christina">Christina</option>
+    </select>
+    <span id="syncState" class="meta">Sync: idle</span>
         </div>
       </div>
 
@@ -593,6 +679,10 @@
       "reading_en","answer","reading_zh"
     ];
 
+    const MASTER_CSV_URL = "https://docs.google.com/spreadsheets/d/1dlRL9EJtQDWokbiXBseCi82hn4Hr8cFYGAYos-e-SI8/export?format=csv&gid=1012776618";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx7CElIMwA7squaZC9qh63vypFwZe6cD--exs8BIAMC1DkvkeeciueIYOOZZKrPP4MD/exec";
+
+
     let allData = [];
     let filteredData = [];
     let currentIndex = 0;
@@ -635,12 +725,181 @@
     const wrongCountText = document.getElementById("wrongCountText");
     const wrongOnlyBtn = document.getElementById("wrongOnlyBtn");
     const resetWrongBtn = document.getElementById("resetWrongBtn");
+    const loadMasterBtn = document.getElementById("loadMasterBtn");
+
+
+    const userSelect = document.getElementById("userSelect");
+    const syncState = document.getElementById("syncState");
+
+    function setSyncState(msg){
+      if(syncState) syncState.textContent = `Sync: ${msg}`;
+    }
 
     let quizIndex = 0;
     let quizRandomOrder = [];
     let quizRandomPtr = 0;
     let wrongSet = new Set();   // 記錄答錯的單字（用 word 當 key）
     let wrongOnlyMode = false;  // 是否只練錯題
+    let starredSet = new Set(); // ⭐ 獨立收藏
+    let currentUserId = (localStorage.getItem("currentUserId") || "rachel").toLowerCase();
+
+
+    function getLocalProgressKey(userId){
+      return `vtp_progress_${String(userId || "rachel").toLowerCase()}`;
+    }
+
+    function saveProgressToLocal(userId){
+      const key = getLocalProgressKey(userId);
+      const payload = {
+        wrongWords: [...wrongSet],
+        starredWords: [...starredSet],
+        updatedAt: Date.now()
+      };
+      localStorage.setItem(key, JSON.stringify(payload));
+    }
+
+    function loadProgressFromLocal(userId){
+      const key = getLocalProgressKey(userId);
+      try{
+        const raw = localStorage.getItem(key);
+        if(!raw){
+          return { wrongWords: [], starredWords: [], updatedAt: 0 };
+        }
+        const obj = JSON.parse(raw);
+        return {
+          wrongWords: Array.isArray(obj.wrongWords) ? obj.wrongWords : [],
+          starredWords: Array.isArray(obj.starredWords) ? obj.starredWords : [],
+          updatedAt: Number(obj.updatedAt) || 0
+        };
+      }catch{
+        return { wrongWords: [], starredWords: [], updatedAt: 0 };
+      }
+    }
+
+
+    async function saveProgressToCloud(userId){
+      const body = {
+        action: "saveProgress",
+        userId: String(userId).toLowerCase(),
+        wrongWords: [...wrongSet],
+        starredWords: [...starredSet],
+        updatedAt: Date.now()
+      };
+
+      const res = await fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS 相容
+        body: JSON.stringify(body)
+      });
+
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json().catch(() => ({ ok:true }));
+      if(data.ok === false) throw new Error(data.error || "Cloud save failed");
+    }
+
+    async function loadProgressFromCloud(userId){
+      const body = {
+        action: "loadProgress",
+        userId: String(userId).toLowerCase()
+      };
+
+      const res = await fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS 相容
+        body: JSON.stringify(body)
+      });
+
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      return {
+        wrongWords: Array.isArray(data.wrongWords) ? data.wrongWords : [],
+        starredWords: Array.isArray(data.starredWords) ? data.starredWords : [],
+        updatedAt: Number(data.updatedAt) || 0
+      };
+    }
+
+
+
+    let saveTimer = null;
+
+    function scheduleSaveProgress(){
+      // 先寫本機，確保不丟資料
+      saveProgressToLocal(currentUserId);
+
+      // debounce 雲端回存
+      if(saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        try{
+          setSyncState("saving...");
+          await saveProgressToCloud(currentUserId);
+          setSyncState("saved");
+        }catch(err){
+          console.warn("Cloud save failed:", err);
+          setSyncState("cloud failed (kept local)");
+        }
+      }, 600);
+    }
+
+
+    async function applyUserProgress(userId){
+      currentUserId = String(userId || "rachel").toLowerCase();
+      localStorage.setItem("currentUserId", currentUserId);
+
+      // 先讀 local（秒回 UI）
+      const localData = loadProgressFromLocal(currentUserId);
+      wrongSet = new Set(localData.wrongWords || []);
+      starredSet = new Set(localData.starredWords || []);
+      if(allData.length) sanitizeSetsByCurrentData();
+      updateWrongUI();
+      if(filteredData.length){
+        renderFlashcard();
+        if(!quizSection.classList.contains("hidden")) renderQuiz();
+      }
+      setSyncState("local loaded");
+
+      // 再讀 cloud，做衝突解決（Last Write Wins）
+      try{
+        setSyncState("loading cloud...");
+        const cloudData = await loadProgressFromCloud(currentUserId);
+
+        const localTs = Number(localData.updatedAt) || 0;
+        const cloudTs = Number(cloudData.updatedAt) || 0;
+
+        if(cloudTs > localTs){
+          // Cloud 較新：採用 cloud，回寫 local
+          wrongSet = new Set(cloudData.wrongWords || []);
+          starredSet = new Set(cloudData.starredWords || []);
+          if(allData.length) sanitizeSetsByCurrentData();
+          updateWrongUI();
+          if(filteredData.length){
+            renderFlashcard();
+            if(!quizSection.classList.contains("hidden")) renderQuiz();
+          }
+          saveProgressToLocal(currentUserId);
+          setSyncState("cloud newer → applied");
+        }else if(localTs > cloudTs){
+          // Local 較新：推回 cloud
+          await saveProgressToCloud(currentUserId);
+          setSyncState("local newer → pushed");
+        }else{
+          // 時間相同：不動資料
+          setSyncState("in sync");
+        }
+      }catch(err){
+        console.warn("Cloud load failed:", err);
+        setSyncState("cloud load failed (using local)");
+      }
+    }
+
+
+
+    function sanitizeSetsByCurrentData(){
+      const validWords = new Set(allData.map(d => d.word).filter(Boolean));
+      wrongSet = new Set([...wrongSet].filter(w => validWords.has(w)));
+      starredSet = new Set([...starredSet].filter(w => validWords.has(w)));
+    }
 
 
     function parseDelimited(text){
@@ -701,6 +960,7 @@
     }
 
     function applyFilters(keepCurrentWord=true){
+      sanitizeSetsByCurrentData();
       const q = searchInput.value.trim().toLowerCase();
       const lv = levelFilter.value;
       const uv = unitFilter.value;
@@ -803,10 +1063,11 @@
           const ok = chosen === answer;
 
           // ✅ 用 wordKey 記錄錯題（最穩）
-          if(!ok && wordKey){
-            wrongSet.add(wordKey);
-            updateWrongUI();
-          }
+      if(!ok && wordKey){
+        wrongSet.add(wordKey);
+        updateWrongUI();
+        scheduleSaveProgress(); // ✅ 新增
+      }
 
           btns.forEach(b=>{
             const v = b.getAttribute("data-opt");
@@ -962,20 +1223,31 @@
       filterStat.textContent = `${total} 筆`;
 
       flashCard.innerHTML = `
-        <div class="fc-head">
-          <div>
-            <div class="word">${d.word || ""}</div>
-            ${showZh ? `<div class="zh">${d.zh || ""}</div>` : ``}
-            <div class="tiny">US ${d.ipa_us || ""}</div>
-          </div>
-          <div><div class="tiny">Level</div><div style="font-weight:900;font-size:28px;">${d.level || "-"}</div></div>
-          <div><div class="tiny">詞性</div><div style="font-weight:900;font-size:28px;">${d.pos || "-"}</div></div>
-          <button id="speakBtn" class="ghost">🔊 發音</button>
-          <div class="row" style="justify-content:flex-end;">
-            <button id="prevBtn">上一個</button>
-            <button id="nextBtn" class="primary">下一個</button>
-          </div>
-        </div>
+<div class="fc-head">
+  <div class="fc-main">
+    <div class="word">${d.word || ""}</div>
+    ${showZh ? `<div class="zh">${d.zh || ""}</div>` : ``}
+    <div class="tiny">US ${d.ipa_us || ""}</div>
+  </div>
+
+  <div class="fc-meta">
+    <div class="tiny">Level</div>
+    <div class="fc-meta-value">${d.level || "-"}</div>
+  </div>
+
+  <div class="fc-meta">
+    <div class="tiny">詞性</div>
+    <div class="fc-meta-value">${d.pos || "-"}</div>
+  </div>
+
+  <div class="fc-actions">
+    <button id="speakBtn" class="ghost">🔊 發音</button>
+    <button id="starBtn" class="ghost">${starredSet.has(d.word) ? "⭐ 已收藏" : "☆ 收藏"}</button>
+    <button id="prevBtn">上一個</button>
+    <button id="nextBtn" class="primary">下一個</button>
+  </div>
+</div>
+
 
         <div class="box" style="margin-top:10px;">
           <div class="tiny">Morpheme Highlight</div>
@@ -1022,17 +1294,53 @@
         </div>
       `;
 
-      document.getElementById("prevBtn").onclick = () => {
-        currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length;
-        renderFlashcard();
-        if(autoSpeakToggle.checked) speakCurrent();
-      };
-      document.getElementById("nextBtn").onclick = () => {
-        currentIndex = (currentIndex + 1) % filteredData.length;
-        renderFlashcard();
-        if(autoSpeakToggle.checked) speakCurrent();
-      };
-      document.getElementById("speakBtn").onclick = speakCurrent;
+    document.getElementById("prevBtn").onclick = () => {
+      currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length;
+      renderFlashcard();
+      if(autoSpeakToggle.checked) speakCurrent();
+    };
+    document.getElementById("nextBtn").onclick = () => {
+      currentIndex = (currentIndex + 1) % filteredData.length;
+      renderFlashcard();
+      if(autoSpeakToggle.checked) speakCurrent();
+     };
+    document.getElementById("speakBtn").onclick = speakCurrent;
+
+    // ⭐ 一定要放在 renderFlashcard() 內，因為 starBtn 是動態產生的
+    document.getElementById("starBtn").onclick = () => {
+      const w = d.word;
+      if(!w) return;
+
+     if(starredSet.has(w)) starredSet.delete(w);
+      else starredSet.add(w);
+
+      scheduleSaveProgress(); // ✅ 新增
+      renderFlashcard(); // 更新按鈕文字（☆/⭐）
+    };
+    } // ✅ 這個是 renderFlashcard() 的結尾
+
+    async function loadDataIntoApp(rows, sourceLabel){
+      allData = mapRowsToObjects(rows);
+      filteredData = [...allData];
+      currentIndex = 0;
+      quizIndex = 0;
+      resetQuizRandomOrder(currentIndex);
+
+      buildFilters();
+      sanitizeSetsByCurrentData();
+      updateWrongUI();
+
+      filterBar.classList.remove("hidden");
+      emptyState.classList.add("hidden");
+      flashSection.classList.remove("hidden");
+      quizTabBtn.disabled = false;
+
+      meta.innerHTML = `狀態：<span class="ok">已載入</span> ${allData.length} 筆資料（來源：${sourceLabel}）`;
+
+      await applyUserProgress(currentUserId); // <- wait for local/cloud merge first
+      renderFlashcard();
+
+      if(autoSpeakToggle.checked) speakCurrent();
     }
 
     csvFile.addEventListener("change", ()=>{
@@ -1040,6 +1348,7 @@
       fileName.textContent = f ? f.name : "尚未選擇檔案";
       importBtn.disabled = !f;
     });
+
 
     importBtn.addEventListener("click", async ()=>{
       const f = csvFile.files?.[0];
@@ -1049,22 +1358,49 @@
       const { rows, delimiter } = parseDelimited(text);
       if(!rows.length) return alert("檔案為空");
 
-      allData = mapRowsToObjects(rows);
-      filteredData = [...allData];
-      currentIndex = 0;
-      quizIndex = 0; // 測驗模式索引初始化
-      resetQuizRandomOrder(currentIndex);
-
-      buildFilters();
-      filterBar.classList.remove("hidden");
-      emptyState.classList.add("hidden");
-      flashSection.classList.remove("hidden");
-      quizTabBtn.disabled = false;
-
-      meta.innerHTML = `狀態：<span class="ok">已載入</span> ${allData.length} 筆資料（分隔符：${delimiter === "\t" ? "Tab" : "Comma"}）`;
-      renderFlashcard();
-      if(autoSpeakToggle.checked) speakCurrent();
+      await loadDataIntoApp(rows, `本機檔案 / ${delimiter === "\t" ? "Tab" : "Comma"}`);
     });
+
+
+    loadMasterBtn.addEventListener("click", async ()=>{
+      try{
+        meta.textContent = "狀態：正在載入 Master CSV...";
+        loadMasterBtn.disabled = true;
+
+        const res = await fetch(MASTER_CSV_URL, { method: "GET" });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const text = await res.text();
+    if (/^\s*<!doctype html/i.test(text) || /^\s*<html/i.test(text)) {
+      throw new Error("抓到的不是 CSV，請檢查 Google Sheet 分享權限（需可讀取）");
+    }
+        const { rows, delimiter } = parseDelimited(text);
+        if(!rows.length) throw new Error("Master CSV 為空");
+
+        await loadDataIntoApp(rows, `Master CSV / ${delimiter === "\t" ? "Tab" : "Comma"}`);
+      }catch(err){
+        console.error(err);
+        meta.textContent = `狀態：載入 Master CSV 失敗（${err.message}）`;
+        alert(`載入 Master CSV 失敗：${err.message}`);
+      }finally{
+        loadMasterBtn.disabled = false;
+      }
+    });
+
+    userSelect.addEventListener("change", async () => {
+      if(saveTimer){
+        clearTimeout(saveTimer);
+        saveTimer = null;
+      }
+
+      // 先保存舊 user
+      saveProgressToLocal(currentUserId);
+      try{ await saveProgressToCloud(currentUserId); }catch{}
+
+      // 再載入新 user
+      await applyUserProgress(userSelect.value);
+    });
+
 
     searchInput.addEventListener("input", ()=>applyFilters(true));
     levelFilter.addEventListener("change", ()=>applyFilters(true));
@@ -1178,11 +1514,13 @@
       quizIndex = 0;
       resetQuizRandomOrder(quizIndex);
       updateWrongUI();
+      scheduleSaveProgress(); // ✅ 新增
       renderQuiz();
     });
 
     // 預設：匯入前隱藏篩選列
     filterBar.classList.add("hidden");
+
     // --- PATCH: 每張閱讀卡獨立展開/收合中文翻譯（事件委派） ---
     document.addEventListener("click", (e) => {
       const btn = e.target.closest(".toggle-zh-btn");
@@ -1203,7 +1541,20 @@
         btn.textContent = "展開中文翻譯";
       }
     });
-    updateWrongUI();
+
+    // 初始化 sync 與 user（用 async IIFE 避免 race）
+    (async () => {
+      setSyncState("idle");
+      userSelect.value = currentUserId;
+      await applyUserProgress(currentUserId);
+      updateWrongUI();
+    })();
+
+    window.addEventListener("beforeunload", () => {
+      saveProgressToLocal(currentUserId);
+    });
+
   </script>
 </body>
 </html>
+
