@@ -807,17 +807,17 @@
     let pendingWrongDelta = new Set();   // only newly wrong words since last successful sync
     let currentUserId = (localStorage.getItem("currentUserId") || "rachel").toLowerCase();
     let speechReady = false;
-    let speechEnabled = ("speechSynthesis" in window);
+    // 不要在 script 載入當下就決定，改成動態檢查
+    let speechEnabled = true;
     let voicesCache = [];
 
     function initSpeechEngine(){
-      if(!speechEnabled) return;
-
       const synth = window.speechSynthesis;
+      if(!synth) return;
 
-      // 先觸發載入（Android 常需要）
+      speechEnabled = true;
       voicesCache = synth.getVoices() || [];
-      if(voicesCache.length > 0) speechReady = true;
+      speechReady = voicesCache.length > 0;
 
       const onVoicesChanged = () => {
         voicesCache = synth.getVoices() || [];
@@ -825,14 +825,13 @@
         console.log("Voices loaded:", voicesCache.length);
       };
 
-      // 用 addEventListener 避免覆蓋其他 handler
       if(typeof synth.addEventListener === "function"){
         synth.addEventListener("voiceschanged", onVoicesChanged);
       }else{
-        // 舊瀏覽器 fallback
         synth.onvoiceschanged = onVoicesChanged;
       }
     }
+
 
     function pickBestVoice(targetLang = "en-US"){
       const voices = (window.speechSynthesis?.getVoices?.() || []);
@@ -1418,54 +1417,58 @@ function clearMasterCache(userId){
       if(!quizSection.classList.contains("hidden")) renderQuiz();
     }
 
+    let speakToken = 0;
+
     function speakCurrent(){
-      if(!speechEnabled){
+      const synth = window.speechSynthesis;
+      if(!synth || typeof SpeechSynthesisUtterance === "undefined"){
         alert("此瀏覽器不支援語音發音（speechSynthesis）");
         return;
       }
-      if(!filteredData.length) return;
 
+      if(!filteredData.length) return;
       const d = filteredData[currentIndex];
-      const text = String(d.tts_text || d.word || "").trim();
+     const text = String(d.tts_text || d.word || "").trim();
       if(!text) return;
 
       const lang = String(d.tts_lang || "en-US").trim();
       const rate = Number(rateRange.value) || 1.0;
-      const synth = window.speechSynthesis;
 
-      // Android/desktop 都較穩：先取消正在播的
+      speechEnabled = true;
+
+      // 每次呼叫產生 token，舊的 setTimeout 會自動失效
+      const myToken = ++speakToken;
+
       try{
+        voicesCache = synth.getVoices() || [];
         if(synth.speaking || synth.pending) synth.cancel();
-      }catch(e){
-        console.warn("speech cancel error:", e);
-      }
 
-      // 小延遲可降低 Android 無聲機率
-      setTimeout(() => {
-        try{
+        setTimeout(() => {
+          // 若中途又被新一次 speakCurrent 覆蓋，就跳出
+          if(myToken !== speakToken) return;
+
           const utter = new SpeechSynthesisUtterance(text);
           utter.lang = lang;
           utter.rate = Math.min(2, Math.max(0.5, rate));
 
-          // 關鍵：明確指定 voice（Android 很重要）
           const voice = pickBestVoice(lang);
           if(voice) utter.voice = voice;
 
-          utter.onstart = () => {
-            // console.log("🔊 speaking:", text, lang, voice?.name);
-          };
           utter.onerror = (e) => {
             console.error("Speech error:", e?.error || e);
           };
+          utter.onend = () => {
+            // 可留空；主要是讓 debug 更好追
+            // console.log("Speech ended");
+          };
 
           synth.speak(utter);
-        }catch(err){
-          console.error("speakCurrent failed:", err);
-        }
-      }, 120);
-    }
-
-
+        }, 150);
+      }catch(err){
+        console.error("speakCurrent failed:", err);
+        alert("語音啟動失敗，請確認 Android 已安裝 Google 語音引擎與英文語音包。");
+      }
+     }
 
     function shuffle(arr){
       const a = [...arr];
@@ -1825,7 +1828,15 @@ function clearMasterCache(userId){
       renderFlashcard();
       if(autoSpeakToggle.checked) speakCurrent();
      };
-    document.getElementById("speakBtn").onclick = speakCurrent;
+    document.getElementById("speakBtn").onclick = () => {
+      const synth = window.speechSynthesis;
+      if(synth){
+        voicesCache = synth.getVoices() || voicesCache;
+        if(voicesCache.length > 0) speechReady = true;
+      }
+      speakCurrent();
+    };
+
 
     // ⭐ 一定要放在 renderFlashcard() 內，因為 starBtn 是動態產生的
     document.getElementById("starBtn").onclick = () => {
@@ -1876,7 +1887,14 @@ function clearMasterCache(userId){
         if(!quizSection.classList.contains("hidden")) renderQuiz();
       }
 
-      if(autoSpeakToggle.checked) speakCurrent();
+      if(autoSpeakToggle.checked){
+        if(speechReady){
+          speakCurrent();
+        }else{
+          // 給 voices 一點時間載入
+          setTimeout(() => speakCurrent(), 400);
+        }
+      }
     }
 
 
@@ -2145,6 +2163,7 @@ loadMasterBtn.addEventListener("click", async ()=>{
     (async () => {
       setSyncState("idle");
       initSpeechEngine(); // ← 新增這行
+      window.speechSynthesis?.getVoices?.(); // ← 補這行
       userSelect.value = currentUserId;
       await applyUserProgress(currentUserId);
       updateWrongUI();
