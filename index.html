@@ -1767,14 +1767,16 @@ function clearMasterCache(userId){
     <div class="tiny">US ${d.ipa_us || ""}</div>
   </div>
 
-  <div class="fc-meta">
-    <div class="tiny">Level</div>
-    <div class="fc-meta-value">${d.level || "-"}</div>
-  </div>
-
+  <!-- 詞性先 -->
   <div class="fc-meta">
     <div class="tiny">詞性</div>
     <div class="fc-meta-value">${d.pos || "-"}</div>
+  </div>
+
+  <!-- Level 後 -->
+  <div class="fc-meta">
+    <div class="tiny">Level</div>
+    <div class="fc-meta-value">${d.level || "-"}</div>
   </div>
 
   <div class="fc-actions">
@@ -1782,6 +1784,7 @@ function clearMasterCache(userId){
     <button id="starBtn" class="ghost">${starredSet.has(d.word) ? "⭐ 已收藏" : "☆ 收藏"}</button>
     <button id="prevBtn">上一個</button>
     <button id="nextBtn" class="primary">下一個</button>
+    <button id="randomBtn" class="ghost">隨機</button>
   </div>
 </div>
 
@@ -1845,6 +1848,23 @@ function clearMasterCache(userId){
       // ensure voices warm-up right at user gesture
       try { window.speechSynthesis?.getVoices?.(); } catch(e) {}
       speakCurrent();
+    };
+
+    document.getElementById("randomBtn").onclick = () => {
+      if(!filteredData.length) return;
+      if(filteredData.length === 1){
+        if(autoSpeakToggle.checked) speakCurrent();
+        return;
+      }
+
+      let next = currentIndex;
+      while(next === currentIndex){
+        next = Math.floor(Math.random() * filteredData.length);
+      }
+      currentIndex = next;
+
+      renderFlashcard();
+      if(autoSpeakToggle.checked) speakCurrent();
     };
 
 
@@ -2188,4 +2208,3 @@ loadMasterBtn.addEventListener("click", async ()=>{
   </script>
 </body>
 </html>
-
