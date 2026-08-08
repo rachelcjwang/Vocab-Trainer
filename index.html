@@ -1417,26 +1417,41 @@ function clearMasterCache(userId){
       if(!quizSection.classList.contains("hidden")) renderQuiz();
     }
 
+    
     let speakToken = 0;
 
-    function speakCurrent(){
-      const synth = window.speechSynthesis;
-      if(!synth || typeof SpeechSynthesisUtterance === "undefined"){
-        alert("此瀏覽器不支援語音發音（speechSynthesis）");
-        return;
-      }
+    function speakByAudioFallback(text, lang = "en-US"){
+      const q = encodeURIComponent(String(text || "").trim());
+      if(!q) return;
 
+      const tl = String(lang || "en-US").slice(0,2).toLowerCase();
+      const src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(tl)}&q=${q}`;
+
+      const audio = new Audio(src);
+      audio.play().catch(err => {
+        console.error("Audio fallback failed:", err);
+        alert("TTS unavailable in current browser context. Please open in Chrome directly.");
+      });
+    }
+
+    function speakCurrent(){
       if(!filteredData.length) return;
       const d = filteredData[currentIndex];
-     const text = String(d.tts_text || d.word || "").trim();
+      const text = String(d.tts_text || d.word || "").trim();
       if(!text) return;
 
       const lang = String(d.tts_lang || "en-US").trim();
       const rate = Number(rateRange.value) || 1.0;
 
-      speechEnabled = true;
+      const synth = window.speechSynthesis;
+      const hasNativeTTS = !!synth && (typeof SpeechSynthesisUtterance !== "undefined");
 
-      // 每次呼叫產生 token，舊的 setTimeout 會自動失效
+      // fallback instead of "not supported" alert
+      if(!hasNativeTTS){
+        speakByAudioFallback(text, lang);
+        return;
+      }
+
       const myToken = ++speakToken;
 
       try{
@@ -1444,7 +1459,6 @@ function clearMasterCache(userId){
         if(synth.speaking || synth.pending) synth.cancel();
 
         setTimeout(() => {
-          // 若中途又被新一次 speakCurrent 覆蓋，就跳出
           if(myToken !== speakToken) return;
 
           const utter = new SpeechSynthesisUtterance(text);
@@ -1456,19 +1470,18 @@ function clearMasterCache(userId){
 
           utter.onerror = (e) => {
             console.error("Speech error:", e?.error || e);
-          };
-          utter.onend = () => {
-            // 可留空；主要是讓 debug 更好追
-            // console.log("Speech ended");
+            // native fails -> fallback
+            speakByAudioFallback(text, lang);
           };
 
           synth.speak(utter);
         }, 150);
       }catch(err){
         console.error("speakCurrent failed:", err);
-        alert("語音啟動失敗，請確認 Android 已安裝 Google 語音引擎與英文語音包。");
+        speakByAudioFallback(text, lang);
       }
-     }
+    }
+
 
     function shuffle(arr){
       const a = [...arr];
@@ -1828,14 +1841,12 @@ function clearMasterCache(userId){
       renderFlashcard();
       if(autoSpeakToggle.checked) speakCurrent();
      };
-    document.getElementById("speakBtn").onclick = () => {
-      const synth = window.speechSynthesis;
-      if(synth){
-        voicesCache = synth.getVoices() || voicesCache;
-        if(voicesCache.length > 0) speechReady = true;
-      }
+    document.getElementById("speakBtn").onclick = async () => {
+      // ensure voices warm-up right at user gesture
+      try { window.speechSynthesis?.getVoices?.(); } catch(e) {}
       speakCurrent();
     };
+
 
 
     // ⭐ 一定要放在 renderFlashcard() 內，因為 starBtn 是動態產生的
