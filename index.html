@@ -638,7 +638,7 @@
       <div class="bar">
         <div class="row">
           <span class="label">發音速度</span>
-          <input id="rateRange" type="range" min="0.6" max="1.4" step="0.1" value="1.0" />
+          <input id="rateRange" type="range" min="0.3" max="1.4" step="0.1" value="1.0" />
           <span id="rateText" class="meta">1.0x</span>
           <button id="resetRateBtn" class="ghost">重設語速</button>
 
@@ -1463,7 +1463,7 @@ function clearMasterCache(userId){
 
           const utter = new SpeechSynthesisUtterance(text);
           utter.lang = lang;
-          utter.rate = Math.min(2, Math.max(0.5, rate));
+          utter.rate = Math.min(2, Math.max(0.3, rate));
 
           const voice = pickBestVoice(lang);
           if(voice) utter.voice = voice;
