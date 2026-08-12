@@ -1235,7 +1235,7 @@ async function postApiJSON(body, retry = 3){
     try{
       const res = await fetchWithTimeout(WEB_APP_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json;charset=utf-8" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, // <-- 改回 text/plain
         body: JSON.stringify(body),
         cache: "no-store",
         redirect: "follow"
@@ -1247,9 +1247,7 @@ async function postApiJSON(body, retry = 3){
       return data;
     }catch(err){
       lastErr = err;
-      if(i < retry){
-        await sleep(700 * (i + 1)); // backoff
-      }
+      if(i < retry) await sleep(800 * (i + 1));
     }
   }
   throw lastErr;
@@ -1950,54 +1948,33 @@ loadMasterBtn.addEventListener("click", async ()=>{
   loadMasterBtn.disabled = true;
 
   const userId = String(currentUserId || "rachel").toLowerCase();
+  const cache = loadMasterCache(userId); // 先拿快取備援
 
   try{
     meta.textContent = "狀態：檢查 Master 版本中...";
 
-    const cache = loadMasterCache(userId);
-
     const result = await loadMasterByChunks({
       userId,
-      chunkSize: DEFAULT_MASTER_CHUNK_SIZE,
+      chunkSize: DEFAULT_MASTER_CHUNK_SIZE || 300,
       ifVersion: cache?.dataVersion || "",
       onProgress: (done, total) => {
         meta.textContent = `狀態：載入 Master 中... ${done}/${total} chunks`;
       }
     });
 
-    // 版本相同：直接用本機快取秒開
     if(result.notModified){
-      if(cache && Array.isArray(cache.rows) && cache.rows.length > 0){
+      if(cache?.rows?.length){
         await loadDataIntoApp(
           cache.rows,
-          `Master CSV(Cache Hit) / v=${cache.dataVersion} / ${cache.rowCount || Math.max(0, cache.rows.length - 1)} rows`,
+          `Master CSV(Cache Hit) / v=${cache.dataVersion}`,
           { skipProgressSync: true }
         );
         meta.textContent = `狀態：Master 秒開（快取命中，v=${cache.dataVersion}）`;
         return;
       }
-
-      // 極少數：後端說沒變但本機沒快取，強制完整重抓
-      meta.textContent = "狀態：快取遺失，改為完整重抓...";
-      const full = await loadMasterByChunks({
-        userId,
-        chunkSize: 800,
-        ifVersion: "",
-        onProgress: (done, total) => {
-          meta.textContent = `狀態：重抓 Master 中... ${done}/${total} chunks`;
-        }
-      });
-
-      if(!full.rows || full.rows.length < 1){
-        throw new Error("Master 資料為空");
-      }
-
-      await loadDataIntoApp(full.rows, `Master CSV(API Chunk) / v=${full.dataVersion || "-"}`);
-      meta.textContent = `狀態：Master 載入完成（${full.rowCount} 筆 / ${full.totalChunks} chunks）`;
-      return;
+      throw new Error("notModified but no local cache");
     }
 
-    // 有新版本：用新資料
     if(!result.rows || result.rows.length < 1){
       throw new Error("Master 資料為空");
     }
@@ -2009,16 +1986,26 @@ loadMasterBtn.addEventListener("click", async ()=>{
     meta.textContent = `狀態：Master 載入完成（${result.rowCount} 筆 / ${result.totalChunks} chunks）`;
 
   }catch(err){
-    console.error(err);
-    clearMasterCache(userId); // 避免壞快取殘留
-    meta.textContent = `狀態：載入 Master 失敗（${err.message}）`;
-    alert(`載入 Master CSV 失敗：${err.message}`);
+    console.error("Master load failed:", err);
+
+    // ✅ fallback 到舊快取，不清掉
+    if(cache?.rows?.length){
+      await loadDataIntoApp(
+        cache.rows,
+        `Master CSV(Cache Fallback) / v=${cache.dataVersion || "-"}`,
+        { skipProgressSync: true }
+      );
+      meta.textContent = `狀態：雲端暫時失敗，已使用本機快取（${err.message}）`;
+      alert(`雲端載入失敗，已改用本機快取。\n原因：${err.message}`);
+    }else{
+      meta.textContent = `狀態：載入 Master 失敗（${err.message}）`;
+      alert(`載入 Master CSV 失敗：${err.message}`);
+    }
   }finally{
     isMasterLoading = false;
     loadMasterBtn.disabled = false;
   }
 });
-
 
 
 
