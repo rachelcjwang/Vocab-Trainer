@@ -1228,7 +1228,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 25000){
   }
 }
 
-async function postApiJSON(body, retry = MASTER_FETCH_RETRY){
+async function postApiJSON(body, retry = 3){
   let lastErr = null;
   for(let i=0; i<=retry; i++){
     try{
