@@ -739,6 +739,7 @@
     ];
 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBbPdgPBeaW6IuomfuhgLjFP_iYp21--kYur1G29Zqay5B5V_1jHSkSBkd4LvXxbfg/exec";
+	const DEFAULT_MASTER_CHUNK_SIZE = 300; 
 
 
     let allData = [];
@@ -1957,7 +1958,7 @@ loadMasterBtn.addEventListener("click", async ()=>{
 
     const result = await loadMasterByChunks({
       userId,
-      chunkSize: 800,
+      chunkSize: DEFAULT_MASTER_CHUNK_SIZE,
       ifVersion: cache?.dataVersion || "",
       onProgress: (done, total) => {
         meta.textContent = `狀態：載入 Master 中... ${done}/${total} chunks`;
