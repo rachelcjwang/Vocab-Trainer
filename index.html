@@ -1216,77 +1216,81 @@ function clearMasterCache(userId){
     console.warn("clearMasterCache failed:", e);
   }
 }
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
- async function loadMasterByChunks(options = {}){
-  const chunkSize = Number(options.chunkSize) || 800;
+async function fetchWithTimeout(url, options = {}, timeoutMs = 25000){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try{
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function postApiJSON(body, retry = MASTER_FETCH_RETRY){
+  let lastErr = null;
+  for(let i=0; i<=retry; i++){
+    try{
+      const res = await fetchWithTimeout(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json;charset=utf-8" },
+        body: JSON.stringify(body),
+        cache: "no-store",
+        redirect: "follow"
+      }, 22000 + i * 5000);
+
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if(data && data.ok === false) throw new Error(data.error || "API returned ok=false");
+      return data;
+    }catch(err){
+      lastErr = err;
+      if(i < retry){
+        await sleep(700 * (i + 1)); // backoff
+      }
+    }
+  }
+  throw lastErr;
+}
+
+	  
+async function loadMasterByChunks(options = {}){
+  const chunkSize = Number(options.chunkSize) || DEFAULT_MASTER_CHUNK_SIZE;
   const userId = String(options.userId || currentUserId || "rachel").toLowerCase();
   const ifVersion = options.ifVersion || "";
 
   // 1) meta
-  const metaRes = await fetch(WEB_APP_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({
-      action: "loadMasterCsvMeta",
-      userId,
-      chunkSize
-    })
+  const metaData = await postApiJSON({
+    action: "loadMasterCsvMeta",
+    userId,
+    chunkSize
   });
-  if(!metaRes.ok) throw new Error(`loadMasterCsvMeta HTTP ${metaRes.status}`);
-  const metaData = await metaRes.json();
-  if(!metaData.ok) throw new Error(metaData.error || "loadMasterCsvMeta failed");
 
   const totalChunks = Number(metaData.totalChunks) || 0;
   const finalChunkSize = Number(metaData.chunkSize) || chunkSize;
   const dataVersion = metaData.dataVersion || "";
   const rowCount = Number(metaData.rowCount) || 0;
 
-  // 空資料
   if(totalChunks === 0){
-    const rows = [Array.isArray(metaData.header) ? metaData.header : []];
+    const rows = [[]];
     saveMasterCache(userId, {
-      dataVersion,
-      rowCount: 0,
-      totalChunks: 0,
-      chunkSize: finalChunkSize,
-      rows
+      dataVersion, rowCount: 0, totalChunks: 0, chunkSize: finalChunkSize, rows
     });
-    return {
-      rows,
-      delimiter: ",",
-      rowCount: 0,
-      totalChunks: 0,
-      chunkSize: finalChunkSize,
-      dataVersion,
-      notModified: false
-    };
+    return { rows, delimiter:",", rowCount:0, totalChunks:0, chunkSize:finalChunkSize, dataVersion, notModified:false };
   }
 
-  let header = null;
-  const allRowsObj = [];
+  if(typeof options.onProgress === "function") options.onProgress(0, totalChunks);
 
-  // 2) first chunk (帶 ifVersion)
-  if(typeof options.onProgress === "function"){
-    options.onProgress(0, totalChunks);
-  }
-
-  const firstRes = await fetch(WEB_APP_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({
-      action: "loadMasterCsvChunk",
-      userId,
-      chunkSize: finalChunkSize,
-      chunkIndex: 0,
-      ifVersion: ifVersion || ""
-    })
+  // 2) chunk 0 (ifVersion short-circuit)
+  const firstData = await postApiJSON({
+    action: "loadMasterCsvChunk",
+    userId,
+    chunkSize: finalChunkSize,
+    chunkIndex: 0,
+    ifVersion
   });
-  if(!firstRes.ok) throw new Error(`loadMasterCsvChunk HTTP ${firstRes.status} @ chunk 0`);
 
-  const firstData = await firstRes.json();
-  if(!firstData.ok) throw new Error(firstData.error || "loadMasterCsvChunk failed @ chunk 0");
-
-  // 版本沒變：後端 short-circuit
   if(firstData.notModified){
     return {
       rows: null,
@@ -1299,50 +1303,32 @@ function clearMasterCache(userId){
     };
   }
 
-  header = Array.isArray(firstData.header) ? firstData.header : [];
-  if(Array.isArray(firstData.rows) && firstData.rows.length){
-    allRowsObj.push(...firstData.rows);
-  }
+  const header = Array.isArray(firstData.header) ? firstData.header.map(h => String(h || "").trim()).filter(Boolean) : [];
+  const allRowsObj = [];
+  if(Array.isArray(firstData.rows) && firstData.rows.length) allRowsObj.push(...firstData.rows);
 
-  // 3) remaining chunks
-  for(let i = 1; i < totalChunks; i++){
-    if(typeof options.onProgress === "function"){
-      options.onProgress(i, totalChunks);
-    }
+  // 3) remaining chunks (per-chunk retry already inside postApiJSON)
+  for(let i=1; i<totalChunks; i++){
+    if(typeof options.onProgress === "function") options.onProgress(i, totalChunks);
 
-    const chunkRes = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        action: "loadMasterCsvChunk",
-        userId,
-        chunkSize: finalChunkSize,
-        chunkIndex: i,
-        ifVersion: ""
-      })
+    const chunkData = await postApiJSON({
+      action: "loadMasterCsvChunk",
+      userId,
+      chunkSize: finalChunkSize,
+      chunkIndex: i,
+      ifVersion: ""
     });
-
-    if(!chunkRes.ok) throw new Error(`loadMasterCsvChunk HTTP ${chunkRes.status} @ chunk ${i}`);
-    const chunkData = await chunkRes.json();
-    if(!chunkData.ok) throw new Error(chunkData.error || `loadMasterCsvChunk failed @ chunk ${i}`);
 
     if(Array.isArray(chunkData.rows) && chunkData.rows.length){
       allRowsObj.push(...chunkData.rows);
     }
   }
 
-  if(typeof options.onProgress === "function"){
-    options.onProgress(totalChunks, totalChunks);
-  }
+  if(typeof options.onProgress === "function") options.onProgress(totalChunks, totalChunks);
 
-  // 4) compose + cache
   const rows = rowsObjectsTo2DRows(allRowsObj, header);
   saveMasterCache(userId, {
-    dataVersion,
-    rowCount,
-    totalChunks,
-    chunkSize: finalChunkSize,
-    rows
+    dataVersion, rowCount, totalChunks, chunkSize: finalChunkSize, rows
   });
 
   return {
@@ -1356,21 +1342,28 @@ function clearMasterCache(userId){
   };
 }
 
-      
-    function mapRowsToObjects(rows){
-      const header = rows[0].map(h => String(h).trim());
-      const lower = header.map(h => h.toLowerCase());
-      const missing = REQUIRED_COLUMNS.filter(c => !lower.includes(c));
-      if(missing.length){
-        console.warn("Missing columns:", missing);
-      }
+function mapRowsToObjects(rows){
+  const rawHeader = (rows[0] || []).map(h => String(h || "").trim());
+  const header = rawHeader.filter(Boolean); // drop empty header key
+  const lower = header.map(h => h.toLowerCase());
 
-      return rows.slice(1).map(r=>{
-        const obj = {};
-        header.forEach((h, i)=> obj[h.toLowerCase()] = (r[i] ?? "").trim());
-        return obj;
-      }).filter(r => r.word);
-    }
+  const missing = REQUIRED_COLUMNS.filter(c => !lower.includes(c));
+  if(missing.length){
+    console.warn("Missing columns:", missing); // warn only
+  }
+
+  return rows.slice(1).map(r=>{
+    const obj = {};
+    header.forEach((h)=>{
+      const idx = rawHeader.indexOf(h);
+      obj[h.toLowerCase()] = String((r[idx] ?? "")).trim();
+    });
+    return obj;
+  }).filter(r => r.word);
+}
+
+      
+
 
     function buildFilters(){
       const levels = [...new Set(allData.map(d=>d.level).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
