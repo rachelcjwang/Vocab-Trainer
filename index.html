@@ -1139,7 +1139,6 @@
 
 
 
-
     let allData = [];
     let filteredData = [];
     let currentIndex = 0;
@@ -1258,8 +1257,6 @@
         synth.onvoiceschanged = onVoicesChanged;
       }
     }
-
-
 
 
     function pickBestVoice(targetLang = "en-US"){
@@ -1474,8 +1471,6 @@
     }
 
 
-
-
     function markWrongWord(word){
       const w = String(word || "").trim();
       if(!w) return;
@@ -1502,9 +1497,6 @@
 
 
 
-
-
-
     function loadProgressFromLocal(userId){
       const key = getLocalProgressKey(userId);
       try{
@@ -1524,8 +1516,6 @@
     }
 
 
-
-
     async function clearWrongBookInCloud(userId){
        const uid = String(userId || "rachel").toLowerCase();
 
@@ -1543,8 +1533,6 @@
       
        return data;
      }
-
-
 
 
     async function saveProgressToCloud(userId){
@@ -1726,7 +1714,6 @@
 
 
 
-
     let saveTimer = null;
 
 
@@ -1748,7 +1735,6 @@
         }
       }, 600);
     }
-
 
 
 
@@ -2167,11 +2153,6 @@ function mapRowsToObjects(rows){
 }
 
 
-      
-
-
-
-
     function buildFilters(){
       const levels = [...new Set(allData.map(d=>d.level).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
       const units = [...new Set(allData.map(d=>(d.unit||"").charAt(0).toUpperCase()).filter(Boolean))].sort();
@@ -2249,63 +2230,62 @@ function mapRowsToObjects(rows){
 
     function speakCurrent(){
       if(!filteredData.length) return;
+
       const d = filteredData[currentIndex];
       const text = String(d.tts_text || d.word || "").trim();
       if(!text) return;
 
-
       const lang = String(d.tts_lang || "en-US").trim();
       const rate = Number(rateRange.value) || 1.0;
-
 
       const synth = window.speechSynthesis;
       const hasNativeTTS = !!synth && (typeof SpeechSynthesisUtterance !== "undefined");
 
-
-      // fallback instead of "not supported" alert
+      // 沒有 native TTS 就安靜失敗，不 alert
       if(!hasNativeTTS){
-        speakByAudioFallback(text, lang);
+        console.warn("Native TTS not supported in this browser context.");
+        setSyncState("TTS not supported");
         return;
       }
 
-
       const myToken = ++speakToken;
-
 
       try{
         voicesCache = synth.getVoices() || [];
-        if(synth.speaking || synth.pending) synth.cancel();
 
+        if(synth.speaking || synth.pending){
+          synth.cancel();
+        }
 
         setTimeout(() => {
           if(myToken !== speakToken) return;
 
+          try{
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = lang;
+            utter.rate = Math.min(2, Math.max(0.3, rate));
 
-          const utter = new SpeechSynthesisUtterance(text);
-          utter.lang = lang;
-          utter.rate = Math.min(2, Math.max(0.3, rate));
+            const voice = pickBestVoice(lang);
+            if(voice) utter.voice = voice;
 
+            utter.onerror = (e) => {
+              console.warn("Speech error:", e?.error || e);
+              setSyncState("TTS error");
+            };
 
-          const voice = pickBestVoice(lang);
-          if(voice) utter.voice = voice;
+            synth.speak(utter);
 
-
-          utter.onerror = (e) => {
-            console.error("Speech error:", e?.error || e);
-            // native fails -> fallback
-            speakByAudioFallback(text, lang);
-          };
-
-
-          synth.speak(utter);
+          }catch(err){
+            console.warn("speakCurrent inner failed:", err);
+            setSyncState("TTS failed");
+          }
         }, 150);
+
       }catch(err){
-        console.error("speakCurrent failed:", err);
-        speakByAudioFallback(text, lang);
+        console.warn("speakCurrent failed:", err);
+        setSyncState("TTS failed");
       }
     }
-
-
 
 
     function shuffle(arr){
@@ -2364,13 +2344,9 @@ function mapRowsToObjects(rows){
     }
 
 
-
-
     function escapeRegExp(str){
       return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
-
-
 
 
     function escapeHTML(value){
@@ -2381,8 +2357,6 @@ function mapRowsToObjects(rows){
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
      }
-
-
 
 
     
@@ -2498,8 +2472,6 @@ function renderQuestion({
 }
 
 
-
-
     function getQuizTypeState(){
       const selected = document.querySelector('input[name="quizType"]:checked')?.value || "q1";
 
@@ -2524,8 +2496,6 @@ function renderQuestion({
       if(wrongStat) wrongStat.textContent = `Wrong: ${wrongSet.size}`;
       if(starStat) starStat.textContent = `Starred: ${starredSet.size}`;
     }
-
-
 
 
     function syncQuizIndexWithActivePool(){
@@ -2657,8 +2627,6 @@ function renderQuestion({
         });
       }
     }
-
-
 
 
     quizIndex = 0;
@@ -2894,7 +2862,6 @@ function renderQuestion({
 
 
 
-
     csvFile.addEventListener("change", ()=>{
       const f = csvFile.files?.[0];
       fileName.textContent = f ? f.name : "尚未選擇檔案";
@@ -2916,8 +2883,6 @@ function renderQuestion({
 
       await loadDataIntoApp(rows, `本機檔案 / ${delimiter === "\t" ? "Tab" : "Comma"}`);
     });
-
-
 
 
 let isMasterLoading = false;
@@ -3065,9 +3030,6 @@ userSelect.addEventListener("change", async () => {
   updateWrongUI();
   updateLearningStatsUI();
 });
-
-
-
 
 
     searchInput.addEventListener("input", ()=>applyFilters(true));
