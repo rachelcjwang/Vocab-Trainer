@@ -27,6 +27,7 @@
       --shadow-2:0 10px 24px rgba(67,106,181,.10);
     }
 
+
     *{ box-sizing:border-box; }
     html,body{ margin:0; padding:0; }
     body{
@@ -38,6 +39,7 @@
         linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
     }
 
+
     .container{ max-width:1100px; margin:12px auto 20px; padding:0 10px; }
     .card{
       background:var(--card);
@@ -47,6 +49,7 @@
       padding:10px;
       margin-bottom:10px;
     }
+
 
     .hero{
       border:1px solid var(--line-2);
@@ -59,6 +62,7 @@
         linear-gradient(135deg, #edf4ff 0%, #f7faff 46%, #ffffff 100%);
     }
 
+
     .hero h1{ margin:0 0 2px; font-size:36px; font-weight:900; }
     .hero p{ margin:0; font-size:14px; color:#1f345f; font-weight:700; }
     .tip{
@@ -66,6 +70,7 @@
       padding:4px 10px; border-radius:999px; border:1px solid #cfe0ff; color:#274783;
       background:linear-gradient(90deg,#e8f0ff 0%, #eef3ff 100%);
     }
+
 
     .bar{
       border:1px solid var(--line);
@@ -75,9 +80,11 @@
       margin-bottom:7px;
     }
 
+
     .row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .grow{ flex:1; min-width:220px; }
     .label{ font-size:12px; font-weight:800; color:#4d5f80; }
+
 
     input[type="text"], input[type="file"], select{
       border:1px solid #dbe6fb; border-radius:8px; background:#fff; color:#182848;
@@ -85,11 +92,13 @@
     }
     input[type="file"]{ max-width:220px; }
 
+
     .file-name{
       display:inline-flex; align-items:center; min-height:32px; padding:0 9px;
       border:1px dashed #cbd9f4; border-radius:8px; background:#fff; color:#5c6b87; font-size:12px;
       max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
+
 
     button{
       border:1px solid #cfdcf7; border-radius:8px; min-height:32px; padding:5px 11px;
@@ -100,27 +109,34 @@
     button.ghost{ color:#20335e; background:#fff; border-color:#d5e2fb; }
     button:disabled{ opacity:.5; cursor:not-allowed; }
 
+
     .meta{ font-size:12px; color:var(--muted); font-weight:700; }
     .ok{ color:var(--ok); font-weight:800; }
 
+
     .hidden{ display:none !important; }
+
 
     .tabs{ display:flex; gap:8px; }
     .tab.active{ background:linear-gradient(180deg,#8eb2ff 0%,#6f9dff 100%); border-color:transparent; color:#fff; }
+
 
     .status-row{
       display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;
       font-size:12px; color:#4d5f80; font-weight:700;
     }
 
+
     .word{ font-size:40px; font-weight:900; line-height:1.05; }
     .zh{ font-size:20px; font-weight:900; color:#1f345f; margin-top:3px; }
     .tiny{ font-size:16px; color:#64748b; font-weight:800; margin-top:3px; }
+
 
     .pill{
       display:inline-flex; align-items:center; border:1px solid #d5e2fb; background:#f2f7ff;
       color:#23407a; border-radius:999px; padding:3px 9px; font-size:12px; font-weight:900;
     }
+
 
     .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
     .box{
@@ -129,6 +145,7 @@
     .box h4{ margin:0 0 6px; font-size:13px; color:#1f345f; }
     .text{ font-size:14px; color:#0f1f44; }
 
+
     .reading{
       border:1px solid #e4ecff; border-radius:10px; background:#fff; padding:10px;
       margin-top:10px;
@@ -136,10 +153,12 @@
     .reading h3{ margin:0 0 8px; }
     .reading p{ margin:0 0 8px; line-height:1.7; }
 
+
     .empty{
       border:1px dashed #d5e2fb; border-radius:10px; background:linear-gradient(180deg,#fcfeff 0%,#f7fbff 100%);
       padding:20px 12px; text-align:center;
     }
+
 
     @media (max-width:900px){
       .fc-head{ grid-template-columns:1fr 1fr; }
@@ -161,10 +180,12 @@
       display:none;
     }
 
+
     /* Morpheme Highlight 外框質感 */
     .box .tiny{
       letter-spacing:.2px;
     }
+
 
     /* 專門強化 Morpheme Highlight 這排 pills，不改位置 */
     .box .text .pill{
@@ -179,6 +200,7 @@
       box-shadow:0 4px 10px rgba(31,52,95,.12);
       filter:saturate(1.05);
     }
+
 
     /* Prefix / Root / Suffix 三色（沿用你現有 pill，不改排版） */
     .box .text .pill:nth-child(1){
@@ -197,6 +219,7 @@
       background:linear-gradient(180deg,#ecfbef 0%, #e2f8e8 100%);
     }
 
+
     /* 手機上視覺更穩（不更動欄位數） */
     @media (max-width:900px){
       .box .text .pill{ margin-top:4px; }
@@ -205,6 +228,7 @@
      PATCH PRO: 詞源解析區 1:1 近似樣式（不改 layout / HTML）
      目標：右側 .grid2 的第 2 個 .box（詞源解析）
      ========================================================= */
+
 
     /* 主容器：淡藍外框 + 乾淨底色 */
     .grid2 > .box:nth-child(2){
@@ -216,6 +240,7 @@
       overflow:hidden;
       padding:12px;
     }
+
 
     /* 標題列（詞源解析） */
     .grid2 > .box:nth-child(2) > h4{
@@ -230,6 +255,7 @@
       letter-spacing:.2px;
     }
 
+
     /* 讓內容形成你圖裡的卡片群感 */
     .grid2 > .box:nth-child(2) .text{
       margin:10px 0 0;
@@ -242,6 +268,7 @@
       color:#0f1f44;
     }
 
+
     /* Prefix 卡 */
     .grid2 > .box:nth-child(2) .text:nth-of-type(1){
       border-color:#cfe1ff;
@@ -250,6 +277,7 @@
     .grid2 > .box:nth-child(2) .text:nth-of-type(1) b{
       color:#2563eb;
     }
+
 
     /* Root 卡 */
     .grid2 > .box:nth-child(2) .text:nth-of-type(2){
@@ -260,6 +288,7 @@
       color:#6d28d9;
     }
 
+
     /* Suffix 卡 */
     .grid2 > .box:nth-child(2) .text:nth-of-type(3){
       border-color:#cbefd7;
@@ -268,6 +297,7 @@
     .grid2 > .box:nth-child(2) .text:nth-of-type(3) b{
       color:#15803d;
     }
+
 
     /* 字義補充（橘色大卡群） */
     .grid2 > .box:nth-child(2) .text:nth-of-type(4),
@@ -282,10 +312,12 @@
       color:#c2410c;
     }
 
+
     /* 小優化：避免你原本 .text 太密 */
     .grid2 > .box:nth-child(2) .text br{
       line-height:1.9;
     }
+
 
     /* 手機端維持比例（不改欄位） */
     @media (max-width:900px){
@@ -301,12 +333,14 @@
     }
     /* ===== PATCH: 左側「例句與延伸」四色卡片化（不改 layout） ===== */
 
+
     /* 左側主框微調 */
     .grid2 > .box:nth-child(1){
       border-color:#dfe9ff;
       background:linear-gradient(180deg,#ffffff 0%, #fcfeff 100%);
       box-shadow:0 2px 10px rgba(47,84,170,.05);
     }
+
 
     /* 標題列 */
     .grid2 > .box:nth-child(1) > h4{
@@ -322,6 +356,7 @@
       color:#0f1f44;
     }
 
+
     /* 每段內容都變成獨立卡片 */
     .grid2 > .box:nth-child(1) .text{
       margin:10px 0 0;
@@ -333,6 +368,7 @@
       line-height:1.7;
     }
 
+
     /* 第 1 卡：Examples（藍） */
     .grid2 > .box:nth-child(1) .text:nth-of-type(1){
       border-color:#cfe1ff;
@@ -341,6 +377,7 @@
     .grid2 > .box:nth-child(1) .text:nth-of-type(1) b{
       color:#2563eb;
     }
+
 
     /* 第 2 卡：Collocation（綠） */
     .grid2 > .box:nth-child(1) .text:nth-of-type(2){
@@ -351,6 +388,7 @@
       color:#166534;
     }
 
+
     /* 第 3 卡：同源字（紫） */
     .grid2 > .box:nth-child(1) .text:nth-of-type(3){
       border-color:#e3d8ff;
@@ -359,6 +397,7 @@
     .grid2 > .box:nth-child(1) .text:nth-of-type(3) b{
       color:#6d28d9;
     }
+
 
     /* 第 4 卡：詞性延伸（橘） */
     .grid2 > .box:nth-child(1) .text:nth-of-type(4){
@@ -369,6 +408,7 @@
       color:#c2410c;
     }
 
+
     /* 讓 Examples 內部英文/中文更像示意圖 */
     .grid2 > .box:nth-child(1) .text:nth-of-type(1) br + b{
       display:inline-block;
@@ -377,6 +417,7 @@
       border-top:1px solid #dbeafe;
       width:100%;
     }
+
 
     /* 卡片 hover（輕微） */
     .grid2 > .box:nth-child(1) .text{
@@ -394,6 +435,7 @@
     .grid2 > .box:nth-child(1) .text.ex-card b{
       color:#2563eb;
     }
+
 
     /* 讓「例句翻譯」在同一卡內有分隔線 */
     .grid2 > .box:nth-child(1) .text.ex-card br + b{
@@ -428,10 +470,12 @@
       line-height:1.6;
     }
 
+
     /* 只讓 Q3 題幹不粗體 */
     #q3 .quiz-stem{
       font-weight:400;
     }
+
 
     .quiz-options{
       display:grid;
@@ -467,6 +511,7 @@
       font-weight:800;
     }
 
+
   /* ===== Flashcard Header Pixel-Perfect Final ===== */
 .fc-head{
   display:grid;
@@ -479,12 +524,14 @@
   margin-top:8px;
 }
 
+
 .fc-main{
   display:flex;
   flex-direction:column;
   justify-content:center;
   min-height:48px;                  /* 與右側元件同基準 */
 }
+
 
 /* Level / 詞性 卡 */
 .fc-meta{
@@ -501,10 +548,12 @@
   box-shadow:0 1px 4px rgba(37,99,235,.05);
 }
 
+
 /* 標籤：Level / 詞性 */
 .fc-head .fc-meta .tiny{
   display:none !important;   /* 隱藏 Level / 詞性 標題 */
 }
+
 
 /* 值：1 / art. */
 .fc-meta-value{
@@ -516,6 +565,7 @@
   color:#0f1f44;
 }
 
+
 /* 右側四顆按鈕區 */
 .fc-actions{
   display:flex;
@@ -525,6 +575,7 @@
   flex-wrap:nowrap;
   min-height:48px;
 }
+
 
 /* 只控制這四顆 */
 .fc-actions > button{
@@ -540,16 +591,19 @@
   justify-content:center;
 }
 
+
 /* 收藏按鈕稍寬，避免換行 */
 .fc-actions > #starBtn{
   min-width:108px;
   white-space:nowrap;
 }
 
+
 /* 其餘按鈕寬度基準 */
 .fc-actions > #speakBtn{ min-width:88px; }
 .fc-actions > #prevBtn,
 .fc-actions > #nextBtn{ min-width:88px; }
+
 
 /* ===== Mobile ===== */
 @media (max-width:900px){
@@ -558,14 +612,17 @@
     gap:8px;
   }
 
+
 .fc-head .fc-meta .tiny{
   display:none !important;
 }
+
 
   .fc-main{
     grid-column:1 / -1;
     min-height:auto;
   }
+
 
   .fc-actions{
     grid-column:1 / -1;
@@ -573,6 +630,7 @@
     flex-wrap:wrap;
     gap:8px;
   }
+
 
   .fc-actions > button{
     flex:1 1 calc(50% - 8px);
@@ -582,20 +640,25 @@
     font-size:16px;
   }
 
+
   .fc-meta{
     height:42px;
     min-height:42px;
     padding:4px 9px 3px;
   }
 
+
   .fc-meta .tiny{
     font-size:11px;
   }
+
 
   .fc-meta-value{
     font-size:16px;
   }
 }
+
+
 
 
   </style>
@@ -608,6 +671,7 @@
       <span class="tip">😎 單字不會背叛你，但是我會!!!HA。</span>
     </section>
 
+
     <section class="card">
       <div class="bar">
         <div class="row">
@@ -615,26 +679,30 @@
           <input id="csvFile" type="file" accept=".csv,text/csv,.tsv,text/tab-separated-values" />
           <span id="fileName" class="file-name">尚未選擇檔案</span>
 
+
           <button id="importBtn" class="primary" disabled>匯入 CSV</button>
-	  <button id="loadMasterBtn" class="ghost">載入 Master CSV</button>
+          <button id="loadMasterBtn" class="ghost">載入 Master CSV</button>
+
 
           <div class="tabs">
             <button id="flashTabBtn" class="tab active">閃卡模式</button>
             <button id="quizTabBtn" class="tab" disabled>測驗模式</button>
           </div>
 
+
     <span class="label" style="margin-left:12px;">使用者</span>
     <select id="userSelect">
       <option value="jocelyn">Jocelyn</option>
       <option value="christina">Christina</option>
       <option value="rachel">Rachel</option>
-	  <option value="ray">Ray</option>
+          <option value="ray">Ray</option>
     </select>
     <span id="syncState" class="meta">Sync: idle</span>
     <span id="wrongStat" class="meta">Wrong: 0</span>
     <span id="starStat" class="meta">Starred: 0</span>
         </div>
       </div>
+
 
       <div class="bar">
         <div class="row">
@@ -643,19 +711,24 @@
           <span id="rateText" class="meta">1.0x</span>
           <button id="resetRateBtn" class="ghost">重設語速</button>
 
+
           <label class="label" style="margin-left:12px;">自動朗讀</label>
           <input id="autoSpeakToggle" type="checkbox" />
 
+
         </div>
       </div>
+
 
       <div class="bar hidden" id="filterBar">
         <div class="row">
           <span class="label">搜尋</span>
           <input id="searchInput" class="grow" type="text" placeholder="單字 / 中文 / 字根 / 例句" />
 
+
           <span class="label">Level</span>
           <select id="levelFilter"><option value="all">全部</option></select>
+
 
           <span class="label">Unit 首字母</span>
           <select id="unitFilter"><option value="all">全部</option></select>
@@ -670,8 +743,10 @@
         </div>
       </div>
 
+
       <div id="meta" class="meta">狀態：尚未載入資料。請先選擇 CSV 並按「匯入 CSV」。</div>
     </section>
+
 
     <section id="emptyState" class="card">
       <div class="empty">
@@ -681,33 +756,52 @@
       </div>
     </section>
 
+
     <section id="flashSection" class="card hidden">
       <div class="status-row">
         <div><span class="pill" id="countPill">0 / 0</span></div>
         <div class="meta">目前篩選：<span id="filterStat">0 筆</span></div>
       </div>
 
+
       <div id="flashCard"></div>
     </section>
+
 
     <section id="quizSection" class="card hidden">
       <div class="status-row">
         <div><span class="pill" id="quizCountPill">0 / 0</span></div>
-        <div class="meta">每字 3 題（英中 / 例句 / 短文）</div>
+        <div class="meta">每次練習一種題型：單字翻譯 / 短句克漏字 / 短文閱讀理解</div>
       </div>
+
 
       <!-- 題型控制列 -->
       <div class="bar" style="margin-top:10px;">
         <div class="row" style="justify-content:space-between;">
           <div class="row">
             <span class="label">題型</span>
-            <label><input type="checkbox" id="toggleQ1" checked> Q1</label>
-            <label><input type="checkbox" id="toggleQ2" checked> Q2</label>
-            <label><input type="checkbox" id="toggleQ3" checked> Q3</label>
+
+            <label>
+              <input type="radio" name="quizType" id="toggleQ1" value="q1" checked>
+              Q1 單字翻譯
+            </label>
+
+            <label>
+              <input type="radio" name="quizType" id="toggleQ2" value="q2">
+              Q2 短句克漏字
+            </label>
+
+            <label>
+              <input type="radio" name="quizType" id="toggleQ3" value="q3">
+              Q3 短文閱讀理解
+            </label>
           </div>
+
           <button id="resetQuizTypeBtn" class="ghost">重設題型</button>
         </div>
       </div>
+
+
 
       <div class="bar" style="margin-top:10px;">
         <div class="row" style="justify-content:space-between;">
@@ -719,7 +813,28 @@
         </div>
       </div>
 
+      <div class="bar" id="learningStatsBar" style="margin-top:10px;">
+        <div class="row" style="justify-content:space-between;">
+          <div class="meta">
+            Q1 單字翻譯：<span id="q1Stat">0 題 / 0%</span>
+          </div>
+          <div class="meta">
+            Q2 短句克漏字：<span id="q2Stat">0 題 / 0%</span>
+          </div>
+          <div class="meta">
+            Q3 短文閱讀理解：<span id="q3Stat">0 題 / 0%</span>
+         </div>
+        </div>
+
+        <div class="meta" style="margin-top:8px;">
+          Level 分布：
+          <span id="levelStat">L1:0 / L2:0 / L3:0 / L4:0 / L5:0 / L6:0 / L7:0</span>
+        </div>
+      </div>
+
+
       <div id="quizCard" style="margin-top:10px;"></div>
+
 
       <div class="row" style="justify-content:flex-end; margin-top:10px;">
         <button id="quizPrevBtn">上一組</button>
@@ -728,7 +843,9 @@
       </div>
     </section>
 
+
   </main>
+
 
   <script>
     const REQUIRED_COLUMNS = [
@@ -739,23 +856,29 @@
       "reading_en","answer","reading_zh"
     ];
 
+
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBbPdgPBeaW6IuomfuhgLjFP_iYp21--kYur1G29Zqay5B5V_1jHSkSBkd4LvXxbfg/exec";
-	const DEFAULT_MASTER_CHUNK_SIZE = 300; 
+        const DEFAULT_MASTER_CHUNK_SIZE = 800; 
+
+
 
 
     let allData = [];
     let filteredData = [];
     let currentIndex = 0;
 
+
     const csvFile = document.getElementById("csvFile");
     const fileName = document.getElementById("fileName");
     const importBtn = document.getElementById("importBtn");
     const quizTabBtn = document.getElementById("quizTabBtn");
 
+
     const rateRange = document.getElementById("rateRange");
     const rateText = document.getElementById("rateText");
     const resetRateBtn = document.getElementById("resetRateBtn");
     const autoSpeakToggle = document.getElementById("autoSpeakToggle");
+
 
     const filterBar = document.getElementById("filterBar");
     const searchInput = document.getElementById("searchInput");
@@ -763,12 +886,14 @@
     const unitFilter = document.getElementById("unitFilter");
     const clearFilterBtn = document.getElementById("clearFilterBtn");
 
+
     const meta = document.getElementById("meta");
     const emptyState = document.getElementById("emptyState");
     const flashSection = document.getElementById("flashSection");
     const flashCard = document.getElementById("flashCard");
     const countPill = document.getElementById("countPill");
     const filterStat = document.getElementById("filterStat");
+
 
     const flashTabBtn = document.getElementById("flashTabBtn");
     const quizSection = document.getElementById("quizSection");
@@ -782,10 +907,17 @@
     const toggleQ2 = document.getElementById("toggleQ2");
     const toggleQ3 = document.getElementById("toggleQ3");
 
+
     const wrongCountText = document.getElementById("wrongCountText");
     const wrongOnlyBtn = document.getElementById("wrongOnlyBtn");
     const resetWrongBtn = document.getElementById("resetWrongBtn");
     const loadMasterBtn = document.getElementById("loadMasterBtn");
+
+    const q1Stat = document.getElementById("q1Stat");
+    const q2Stat = document.getElementById("q2Stat");
+    const q3Stat = document.getElementById("q3Stat");
+    const levelStat = document.getElementById("levelStat");
+
 
 
     const userSelect = document.getElementById("userSelect");
@@ -794,9 +926,11 @@
     const starStat = document.getElementById("starStat");
     const studySetFilter = document.getElementById("studySetFilter");
 
+
     function setSyncState(msg){
       if(syncState) syncState.textContent = `Sync: ${msg}`;
     }
+
 
     let quizIndex = 0;
     let quizRandomOrder = [];
@@ -804,6 +938,9 @@
     let wrongSet = new Set();   // 記錄答錯的單字（用 word 當 key）
     let wrongOnlyMode = false;  // 是否只練錯題
     let starredSet = new Set(); // ⭐ 獨立收藏
+    let learningStats = createEmptyLearningStats(); 
+    let learningStatsSaveTimer = null;
+
     
     // --- NEW: delta buffer for wrong-book accumulate semantics ---
     let pendingWrongDelta = new Set();   // only newly wrong words since last successful sync
@@ -813,19 +950,23 @@
     let speechEnabled = true;
     let voicesCache = [];
 
+
     function initSpeechEngine(){
       const synth = window.speechSynthesis;
       if(!synth) return;
 
+
       speechEnabled = true;
       voicesCache = synth.getVoices() || [];
       speechReady = voicesCache.length > 0;
+
 
       const onVoicesChanged = () => {
         voicesCache = synth.getVoices() || [];
         speechReady = voicesCache.length > 0;
         console.log("Voices loaded:", voicesCache.length);
       };
+
 
       if(typeof synth.addEventListener === "function"){
         synth.addEventListener("voiceschanged", onVoicesChanged);
@@ -835,36 +976,139 @@
     }
 
 
+
+
     function pickBestVoice(targetLang = "en-US"){
       const voices = (window.speechSynthesis?.getVoices?.() || []);
       if(!voices.length) return null;
 
+
       const norm = String(targetLang || "en-US").toLowerCase();
       const base = norm.split("-")[0]; // "en"
+
 
       // 1) exact lang
       let v = voices.find(x => String(x.lang || "").toLowerCase() === norm);
       if(v) return v;
 
+
       // 2) same base lang
       v = voices.find(x => String(x.lang || "").toLowerCase().startsWith(base));
       if(v) return v;
+
 
       // 3) english fallback
       v = voices.find(x => String(x.lang || "").toLowerCase().startsWith("en"));
       if(v) return v;
 
+
       // 4) default voice
       v = voices.find(x => x.default);
       if(v) return v;
 
+
       return voices[0] || null;
+    }
+
+    function createEmptyLearningStats(){
+      return {
+        q1: { total: 0, correct: 0 },
+        q2: { total: 0, correct: 0 },
+        q3: { total: 0, correct: 0 },
+        levels: {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0
+        },
+        updatedAt: 0
+      };
+    }
+
+    function normalizeLearningStats(obj){
+      const base = createEmptyLearningStats();
+      const src = obj || {};
+
+      ["q1", "q2", "q3"].forEach(q => {
+        base[q].total = Number(src[q]?.total) || 0;
+        base[q].correct = Number(src[q]?.correct) || 0;
+      });
+
+      for(let i = 1; i <= 7; i++){
+        const lv = String(i);
+        base.levels[lv] = Number(src.levels?.[lv]) || 0;
+      }
+
+      base.updatedAt = Number(src.updatedAt) || 0;
+
+      return base;
+    }
+
+    function getAccuracy(q){
+      const total = Number(learningStats[q]?.total) || 0;
+      const correct = Number(learningStats[q]?.correct) || 0;
+      if(!total) return 0;
+      return Math.round((correct / total) * 100);
+    }
+
+    function updateLearningStatsUI(){
+      if(q1Stat){
+        q1Stat.textContent = `${learningStats.q1.total} 題 / ${getAccuracy("q1")}%`;
+      }
+
+      if(q2Stat){
+        q2Stat.textContent = `${learningStats.q2.total} 題 / ${getAccuracy("q2")}%`;
+      }
+
+      if(q3Stat){
+        q3Stat.textContent = `${learningStats.q3.total} 題 / ${getAccuracy("q3")}%`;
+      }
+
+      if(levelStat){
+        levelStat.textContent = [
+          `L1:${learningStats.levels["1"] || 0}`,
+          `L2:${learningStats.levels["2"] || 0}`,
+          `L3:${learningStats.levels["3"] || 0}`,
+          `L4:${learningStats.levels["4"] || 0}`,
+          `L5:${learningStats.levels["5"] || 0}`,
+          `L6:${learningStats.levels["6"] || 0}`,
+          `L7:${learningStats.levels["7"] || 0}`
+        ].join(" / ");
+      }
+    }
+
+    function getLocalLearningStatsKey(userId){
+      return `vtp_learning_stats_${String(userId || "rachel").toLowerCase()}`;
+    }
+
+    function saveLearningStatsToLocal(userId){
+      const key = getLocalLearningStatsKey(userId);
+      learningStats.updatedAt = Date.now();
+      localStorage.setItem(key, JSON.stringify(learningStats));
+    }
+
+    function loadLearningStatsFromLocal(userId){
+      const key = getLocalLearningStatsKey(userId);
+
+      try{
+        const raw = localStorage.getItem(key);
+        if(!raw) return createEmptyLearningStats();
+
+        const obj = JSON.parse(raw);
+        return normalizeLearningStats(obj);
+      }catch{
+        return createEmptyLearningStats();
+      }
     }
 
 
     function getLocalProgressKey(userId){
       return `vtp_progress_${String(userId || "rachel").toLowerCase()}`;
     }
+
 
     function saveProgressToLocal(userId){
       const key = getLocalProgressKey(userId);
@@ -877,9 +1121,12 @@
     }
 
 
+
+
     function markWrongWord(word){
       const w = String(word || "").trim();
       if(!w) return;
+
 
       // if this word is newly added to wrongSet, push to delta
       if(!wrongSet.has(w)){
@@ -888,11 +1135,22 @@
       }
     }
 
-    function flushWrongDelta(){
-      const out = [...pendingWrongDelta];
-      pendingWrongDelta.clear();
-      return out;
+
+    function getWrongDeltaSnapshot(){
+        return [...pendingWrongDelta];
+     }
+
+
+    function clearSyncedWrongDelta(words){
+        for(const w of (words || [])){
+          pendingWrongDelta.delete(w);
+       }
     }
+
+
+
+
+
 
     function loadProgressFromLocal(userId){
       const key = getLocalProgressKey(userId);
@@ -912,11 +1170,37 @@
       }
     }
 
+
+
+
+    async function clearWrongBookInCloud(userId){
+       const uid = String(userId || "rachel").toLowerCase();
+
+
+       const data = await postApiJSON({
+         action: "clearWrongBook",
+         userId: uid,
+         updatedAt: Date.now()
+       });
+
+
+       if(data.ok === false){
+         throw new Error(data.error || "clearWrongBook failed");
+       }
+      
+       return data;
+     }
+
+
+
+
     async function saveProgressToCloud(userId){
       const uid = String(userId).toLowerCase();
 
+
       // only send newly wrong words for accumulate API semantics
-      const wrongDeltaWords = flushWrongDelta();
+      const wrongDeltaWords = getWrongDeltaSnapshot(); 
+
 
       // New unified action (preferred)
       const bundleBody = {
@@ -927,6 +1211,7 @@
         updatedAt: Date.now()
       };
 
+
       try{
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
@@ -934,12 +1219,17 @@
           body: JSON.stringify(bundleBody)
         });
 
+
         if(!res.ok) throw new Error(`saveProgressBundle HTTP ${res.status}`);
         const data = await res.json().catch(() => ({ ok:true }));
         if(data.ok === false) throw new Error(data.error || "saveProgressBundle failed");
-        return; // success
+
+
+    clearSyncedWrongDelta(wrongDeltaWords);
+    return; // success 
       }catch(bundleErr){
         console.warn("bundle save failed, fallback to legacy APIs:", bundleErr);
+
 
         // Fallback strategy (backward compatible):
         // 1) wrong -> send delta only (avoid over-counting)
@@ -959,6 +1249,7 @@
           if(dataWrong.ok === false) throw new Error(dataWrong.error || "saveWrongBook failed");
         }
 
+
         // 2) starred overwrite
         const resStar = await fetch(WEB_APP_URL, {
           method: "POST",
@@ -973,11 +1264,70 @@
         if(!resStar.ok) throw new Error(`saveStarredList HTTP ${resStar.status}`);
         const dataStar = await resStar.json().catch(() => ({ ok:true }));
         if(dataStar.ok === false) throw new Error(dataStar.error || "saveStarredList failed");
+        clearSyncedWrongDelta(wrongDeltaWords); 
       }
     }
 
+
+    async function saveLearningStatsToCloud(userId, statsSnapshot = null){
+      const uid = String(userId || "rachel").toLowerCase();
+      const statsToSave = normalizeLearningStats(statsSnapshot || learningStats);
+      statsToSave.updatedAt = Date.now();
+
+      const data = await postApiJSON({
+        action: "saveLearningStats",
+        userId: uid,
+        stats: statsToSave,
+        updatedAt: statsToSave.updatedAt
+      });
+    
+      if(data.ok === false){
+        throw new Error(data.error || "saveLearningStats failed");
+      }
+
+      return data;
+    }
+
+
+    async function loadLearningStatsFromCloud(userId){
+      const uid = String(userId || "rachel").toLowerCase();
+
+      const data = await postApiJSON({
+        action: "loadLearningStats",
+        userId: uid
+      });
+
+      if(data.ok === false){
+        throw new Error(data.error || "loadLearningStats failed");
+      }
+
+      return normalizeLearningStats(data.stats || {});
+    }
+
+    function scheduleSaveLearningStats(){
+      saveLearningStatsToLocal(currentUserId);
+
+      const uidSnapshot = currentUserId;
+      const statsSnapshot = normalizeLearningStats(learningStats);
+
+      if(learningStatsSaveTimer) clearTimeout(learningStatsSaveTimer);
+
+      learningStatsSaveTimer = setTimeout(async () => {
+        try{
+          setSyncState("saving stats...");
+          await saveLearningStatsToCloud(uidSnapshot, statsSnapshot);
+          setSyncState("stats saved");
+        }catch(err){
+          console.warn("Learning stats cloud save failed:", err);
+          setSyncState("stats cloud failed");
+        }
+      }, 800);
+    }
+
+
     async function loadProgressFromCloud(userId){
       const uid = String(userId).toLowerCase();
+
 
       const [resWrong, resStar] = await Promise.all([
     fetch(WEB_APP_URL, {
@@ -992,11 +1342,14 @@
     })
   ]);
 
+
       if(!resWrong.ok) throw new Error(`loadWrongBook HTTP ${resWrong.status}`);
       if(!resStar.ok) throw new Error(`loadStarredList HTTP ${resStar.status}`);
 
+
       const wrongData = await resWrong.json();
       const starData  = await resStar.json();
+
 
       const wrongWords = Array.isArray(wrongData.words)
         ? wrongData.words
@@ -1004,7 +1357,9 @@
           ? wrongData.records.map(x => x.word).filter(Boolean)
           : [];
 
+
       const starredWords = Array.isArray(starData.words) ? starData.words : [];
+
 
       return {
         wrongWords,
@@ -1017,11 +1372,15 @@
     }
 
 
+
+
     let saveTimer = null;
+
 
     function scheduleSaveProgress(){
       // 先寫本機，確保不丟資料
       saveProgressToLocal(currentUserId);
+
 
       // debounce 雲端回存
       if(saveTimer) clearTimeout(saveTimer);
@@ -1038,15 +1397,19 @@
     }
 
 
+
+
     async function applyUserProgress(userId){
       currentUserId = String(userId || "rachel").toLowerCase();
       localStorage.setItem("currentUserId", currentUserId);
+
 
       // 先讀 local（秒回 UI）
       const localData = loadProgressFromLocal(currentUserId);
       wrongSet = new Set(localData.wrongWords || []);
       starredSet = new Set(localData.starredWords || []);
       pendingWrongDelta.clear();
+
 
       if(allData.length) sanitizeSetsByCurrentData();
       updateWrongUI();
@@ -1056,19 +1419,23 @@
       }
       setSyncState("local loaded");
 
+
       // 再讀 cloud，做衝突解決（Last Write Wins）
       try{
         setSyncState("loading cloud...");
         const cloudData = await loadProgressFromCloud(currentUserId);
 
+
         const localTs = Number(localData.updatedAt) || 0;
         const cloudTs = Number(cloudData.updatedAt) || 0;
+
 
         if(cloudTs > localTs){
           // Cloud 較新：採用 cloud，回寫 local
           wrongSet = new Set(cloudData.wrongWords || []);
           starredSet = new Set(cloudData.starredWords || []);
           pendingWrongDelta.clear();
+
 
           if(allData.length) sanitizeSetsByCurrentData();
           updateWrongUI();
@@ -1098,6 +1465,52 @@
     }
 
 
+    async function applyUserLearningStats(userId){
+      const uid = String(userId || "rachel").toLowerCase();
+
+      // 先讀 local，讓 UI 秒更新
+      const localStats = loadLearningStatsFromLocal(uid);
+      learningStats = normalizeLearningStats(localStats);
+      updateLearningStatsUI();
+
+      // 再讀 cloud，做 Last Write Wins
+      try{
+        const cloudStats = await loadLearningStatsFromCloud(uid);
+
+        const localTs = Number(localStats.updatedAt) || 0;
+        const cloudTs = Number(cloudStats.updatedAt) || 0;
+
+        if(cloudTs > localTs){
+          // Cloud 較新：採用 cloud，並回寫 local
+          learningStats = normalizeLearningStats(cloudStats);
+          saveLearningStatsToLocal(uid);
+          setSyncState("stats cloud newer → applied");
+
+        }else if(localTs > cloudTs){
+          // Local 較新：補推到 cloud
+          setSyncState("stats local newer → saving cloud...");
+
+          try{
+            await saveLearningStatsToCloud(uid, learningStats);
+            setSyncState("stats cloud updated");
+          }catch(err){
+            console.warn("Push local learning stats failed:", err);
+            setSyncState("stats cloud push failed");
+          }
+
+        }else{
+          setSyncState("stats in sync");
+        }
+
+        updateLearningStatsUI();
+
+      }catch(err){
+        console.warn("Cloud learning stats load failed:", err);
+        setSyncState("stats cloud load failed");
+        updateLearningStatsUI();
+      }
+    }
+
 
     function sanitizeSetsByCurrentData(){
       const validWords = new Set(allData.map(d => d.word).filter(Boolean));
@@ -1105,9 +1518,11 @@
       starredSet = new Set([...starredSet].filter(w => validWords.has(w)));
     }
 
+
     function parseDelimited(text){
       // 1) Normalize line endings: CRLF / CR -> LF
       text = String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
 
       // 2) Auto-detect delimiter from first non-empty line
       const firstLine = text.split("\n").find(line => line.trim().length > 0) || "";
@@ -1115,14 +1530,17 @@
       const commaCount = (firstLine.match(/,/g) || []).length;
       const delimiter = tabCount > commaCount ? "\t" : ",";
 
+
       const rows = [];
       let row = [];
       let cell = "";
       let inQuotes = false;
 
+
       for(let i = 0; i < text.length; i++){
         const ch = text[i];
         const next = text[i + 1];
+
 
         if(ch === '"'){
           if(inQuotes && next === '"'){
@@ -1136,27 +1554,33 @@
           continue;
         }
 
+
         if(ch === delimiter && !inQuotes){
           row.push(cell);
           cell = "";
           continue;
         }
 
+
         if(ch === "\n" && !inQuotes){
           row.push(cell);
+
 
           // keep non-empty rows (same behavior as your old code)
           if(row.some(v => v !== "")){
             rows.push(row);
           }
 
+
           row = [];
           cell = "";
           continue;
         }
 
+
         cell += ch;
       }
+
 
       // 3) Flush tail
       if(cell.length > 0 || row.length > 0){
@@ -1166,8 +1590,10 @@
         }
       }
 
+
       return { rows, delimiter };
     }
+
 
     function rowsObjectsTo2DRows(rowsObj, header){
       const h = (header || []).map(x => String(x || "").trim());
@@ -1178,12 +1604,15 @@
       return rows;
     }
 
+
 // ===== Master cache helpers =====
 const MASTER_CACHE_KEY_PREFIX = "vtp_master_cache_v1";
+
 
 function getMasterCacheKey(userId){
   return `${MASTER_CACHE_KEY_PREFIX}:${String(userId || "rachel").toLowerCase()}`;
 }
+
 
 function saveMasterCache(userId, payload){
   try{
@@ -1196,6 +1625,7 @@ function saveMasterCache(userId, payload){
     console.warn("saveMasterCache failed:", e);
   }
 }
+
 
 function loadMasterCache(userId){
   try{
@@ -1211,6 +1641,7 @@ function loadMasterCache(userId){
   }
 }
 
+
 function clearMasterCache(userId){
   try{
     localStorage.removeItem(getMasterCacheKey(userId));
@@ -1219,6 +1650,7 @@ function clearMasterCache(userId){
   }
 }
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = 25000){
   const controller = new AbortController();
@@ -1229,6 +1661,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 25000){
     clearTimeout(timer);
   }
 }
+
 
 async function postApiJSON(body, retry = 3){
   let lastErr = null;
@@ -1242,6 +1675,7 @@ async function postApiJSON(body, retry = 3){
         redirect: "follow"
       }, 22000 + i * 5000);
 
+
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if(data && data.ok === false) throw new Error(data.error || "API returned ok=false");
@@ -1254,11 +1688,13 @@ async function postApiJSON(body, retry = 3){
   throw lastErr;
 }
 
-	  
+
+          
 async function loadMasterByChunks(options = {}){
   const chunkSize = Number(options.chunkSize) || DEFAULT_MASTER_CHUNK_SIZE;
   const userId = String(options.userId || currentUserId || "rachel").toLowerCase();
   const ifVersion = options.ifVersion || "";
+
 
   // 1) meta
   const metaData = await postApiJSON({
@@ -1267,10 +1703,12 @@ async function loadMasterByChunks(options = {}){
     chunkSize
   });
 
+
   const totalChunks = Number(metaData.totalChunks) || 0;
   const finalChunkSize = Number(metaData.chunkSize) || chunkSize;
   const dataVersion = metaData.dataVersion || "";
   const rowCount = Number(metaData.rowCount) || 0;
+
 
   if(totalChunks === 0){
     const rows = [[]];
@@ -1280,7 +1718,9 @@ async function loadMasterByChunks(options = {}){
     return { rows, delimiter:",", rowCount:0, totalChunks:0, chunkSize:finalChunkSize, dataVersion, notModified:false };
   }
 
+
   if(typeof options.onProgress === "function") options.onProgress(0, totalChunks);
+
 
   // 2) chunk 0 (ifVersion short-circuit)
   const firstData = await postApiJSON({
@@ -1290,6 +1730,7 @@ async function loadMasterByChunks(options = {}){
     chunkIndex: 0,
     ifVersion
   });
+
 
   if(firstData.notModified){
     return {
@@ -1303,13 +1744,16 @@ async function loadMasterByChunks(options = {}){
     };
   }
 
+
   const header = Array.isArray(firstData.header) ? firstData.header.map(h => String(h || "").trim()).filter(Boolean) : [];
   const allRowsObj = [];
   if(Array.isArray(firstData.rows) && firstData.rows.length) allRowsObj.push(...firstData.rows);
 
+
   // 3) remaining chunks (per-chunk retry already inside postApiJSON)
   for(let i=1; i<totalChunks; i++){
     if(typeof options.onProgress === "function") options.onProgress(i, totalChunks);
+
 
     const chunkData = await postApiJSON({
       action: "loadMasterCsvChunk",
@@ -1319,17 +1763,21 @@ async function loadMasterByChunks(options = {}){
       ifVersion: ""
     });
 
+
     if(Array.isArray(chunkData.rows) && chunkData.rows.length){
       allRowsObj.push(...chunkData.rows);
     }
   }
 
+
   if(typeof options.onProgress === "function") options.onProgress(totalChunks, totalChunks);
+
 
   const rows = rowsObjectsTo2DRows(allRowsObj, header);
   saveMasterCache(userId, {
     dataVersion, rowCount, totalChunks, chunkSize: finalChunkSize, rows
   });
+
 
   return {
     rows,
@@ -1342,15 +1790,18 @@ async function loadMasterByChunks(options = {}){
   };
 }
 
+
 function mapRowsToObjects(rows){
   const rawHeader = (rows[0] || []).map(h => String(h || "").trim());
   const header = rawHeader.filter(Boolean); // drop empty header key
   const lower = header.map(h => h.toLowerCase());
 
+
   const missing = REQUIRED_COLUMNS.filter(c => !lower.includes(c));
   if(missing.length){
     console.warn("Missing columns:", missing); // warn only
   }
+
 
   return rows.slice(1).map(r=>{
     const obj = {};
@@ -1362,16 +1813,21 @@ function mapRowsToObjects(rows){
   }).filter(r => r.word);
 }
 
+
       
+
+
 
 
     function buildFilters(){
       const levels = [...new Set(allData.map(d=>d.level).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
       const units = [...new Set(allData.map(d=>(d.unit||"").charAt(0).toUpperCase()).filter(Boolean))].sort();
 
+
       levelFilter.innerHTML = `<option value="all">全部</option>` + levels.map(v=>`<option value="${v}">${v}</option>`).join("");
       unitFilter.innerHTML = `<option value="all">全部</option>` + units.map(v=>`<option value="${v}">${v}</option>`).join("");
     }
+
 
     function applyFilters(keepCurrentWord=true){
       sanitizeSetsByCurrentData();
@@ -1380,12 +1836,15 @@ function mapRowsToObjects(rows){
       const uv = unitFilter.value;
       const sf = studySetFilter ? studySetFilter.value : "all";
 
+
       const currentWord = keepCurrentWord && filteredData[currentIndex] ? filteredData[currentIndex].word : null;
+
 
       filteredData = allData.filter(d=>{
         const text = [
           d.word,d.zh,d.prefix,d.root,d.suffix,d.example_en,d.example_zh,d.reading_en,d.reading_zh
         ].join(" ").toLowerCase();
+
 
         const hitQ = !q || text.includes(q);
         const hitL = lv === "all" || d.level === lv;
@@ -1396,13 +1855,16 @@ function mapRowsToObjects(rows){
           sf === "starred" ? starredSet.has(d.word) :
           true;
 
+
         return hitQ && hitL && hitU && hitS;
       });
+
 
       if(currentWord){
         const idx = filteredData.findIndex(d => d.word === currentWord);
         currentIndex = idx >= 0 ? idx : 0;
       }else currentIndex = 0;
+
 
       quizIndex = currentIndex;    // 直接同步到同一字
       resetQuizRandomOrder(currentIndex);
@@ -1410,15 +1872,19 @@ function mapRowsToObjects(rows){
       if(!quizSection.classList.contains("hidden")) renderQuiz();
     }
 
+
     
     let speakToken = 0;
+
 
     function speakByAudioFallback(text, lang = "en-US"){
       const q = encodeURIComponent(String(text || "").trim());
       if(!q) return;
 
+
       const tl = String(lang || "en-US").slice(0,2).toLowerCase();
       const src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(tl)}&q=${q}`;
+
 
       const audio = new Audio(src);
       audio.play().catch(err => {
@@ -1427,17 +1893,21 @@ function mapRowsToObjects(rows){
       });
     }
 
+
     function speakCurrent(){
       if(!filteredData.length) return;
       const d = filteredData[currentIndex];
       const text = String(d.tts_text || d.word || "").trim();
       if(!text) return;
 
+
       const lang = String(d.tts_lang || "en-US").trim();
       const rate = Number(rateRange.value) || 1.0;
 
+
       const synth = window.speechSynthesis;
       const hasNativeTTS = !!synth && (typeof SpeechSynthesisUtterance !== "undefined");
+
 
       // fallback instead of "not supported" alert
       if(!hasNativeTTS){
@@ -1445,27 +1915,34 @@ function mapRowsToObjects(rows){
         return;
       }
 
+
       const myToken = ++speakToken;
+
 
       try{
         voicesCache = synth.getVoices() || [];
         if(synth.speaking || synth.pending) synth.cancel();
 
+
         setTimeout(() => {
           if(myToken !== speakToken) return;
+
 
           const utter = new SpeechSynthesisUtterance(text);
           utter.lang = lang;
           utter.rate = Math.min(2, Math.max(0.3, rate));
 
+
           const voice = pickBestVoice(lang);
           if(voice) utter.voice = voice;
+
 
           utter.onerror = (e) => {
             console.error("Speech error:", e?.error || e);
             // native fails -> fallback
             speakByAudioFallback(text, lang);
           };
+
 
           synth.speak(utter);
         }, 150);
@@ -1474,6 +1951,8 @@ function mapRowsToObjects(rows){
         speakByAudioFallback(text, lang);
       }
     }
+
+
 
 
     function shuffle(arr){
@@ -1485,10 +1964,12 @@ function mapRowsToObjects(rows){
       return a;
     }
 
+
     function resetQuizRandomOrder(startIndex = -1){
       const active = getActiveQuizData();
       quizRandomOrder = active.map((_, i) => i);
       quizRandomOrder = shuffle(quizRandomOrder);
+
 
       if(quizRandomOrder.length > 1 && startIndex >= 0 && quizRandomOrder[0] === startIndex){
         [quizRandomOrder[0], quizRandomOrder[1]] = [quizRandomOrder[1], quizRandomOrder[0]];
@@ -1496,10 +1977,12 @@ function mapRowsToObjects(rows){
       quizRandomPtr = 0;
     }
 
+
     function ensureOptions(options, fallback, pool=[]){
       const out = [];
       const seen = new Set();
       const fb = String(fallback || "").trim();
+
 
       for(const x of (options || [])){
         const s = String(x || "").trim();
@@ -1507,6 +1990,7 @@ function mapRowsToObjects(rows){
         seen.add(s);
         out.push(s);
       }
+
 
       for(const x of (pool || [])){
         const s = String(x || "").trim();
@@ -1516,25 +2000,46 @@ function mapRowsToObjects(rows){
         if(out.length >= 4) break;
       }
 
+
       // 最後保底：重複正解，不放 "-"
       while(out.length < 4){
         out.push(fb || "N/A");
       }
 
+
       return out.slice(0,4);
     }
+
+
 
 
     function escapeRegExp(str){
       return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
+
+
+
+    function escapeHTML(value){
+       return String(value ?? "")
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+     }
+
+
+
+
+    
     function maskWordInSentence(sentence, target){
       if(!sentence || !target) return sentence || "-";
       const re = new RegExp(`\\b${escapeRegExp(target)}\\b`, "gi");
       const masked = sentence.replace(re, "_____");
       return masked === sentence ? sentence.replace(new RegExp(escapeRegExp(target), "gi"), "_____") : masked;
     }
+
 
     function splitZhMeanings(zh){
       // 支援：、，,；;/／ | 與空白
@@ -1546,74 +2051,119 @@ function mapRowsToObjects(rows){
       )];
     }
 
-    function renderQuestion({
-      container, qid, title, stem, options, answer, wordKey
-    }){
-      const opts = (options || []).map(v => String(v ?? "").trim());
+function recordLearningAnswer(qid, isCorrect, level){
+  const q = String(qid || "").toLowerCase();
 
-      container.insertAdjacentHTML("beforeend", `
-        <div class="quiz-q" id="${qid}">
-          <h4>${title}</h4>
-          <p class="quiz-stem">${stem}</p>
-          <div class="quiz-options">
-            ${opts.map((opt, idx) => `<button class="quiz-option" data-idx="${idx}">${opt}</button>`).join("")}
-          </div>
-          <div class="quiz-result hidden"></div>
-        </div>
-      `);
+  if(!["q1", "q2", "q3"].includes(q)) return;
 
-      const qEl = document.getElementById(qid);
-      const btns = [...qEl.querySelectorAll(".quiz-option")];
-      const result = qEl.querySelector(".quiz-result");
+  learningStats[q].total += 1;
 
-      const answerText = String(answer ?? "").trim();
+  if(isCorrect){
+    learningStats[q].correct += 1;
+  }
 
-      btns.forEach(btn=>{
-        btn.onclick = () => {
-          const idx = Number(btn.getAttribute("data-idx"));
-          const chosen = opts[idx] || "";
-          const ok = chosen === answerText;
+  const lv = String(level || "").trim();
 
-          if(!ok && wordKey){
-            // 用你目前版本的錯題記錄方式即可
-            if (typeof markWrongWord === "function") markWrongWord(wordKey);
-            else wrongSet.add(wordKey);
+  if(["1","2","3","4","5","6","7"].includes(lv)){
+    learningStats.levels[lv] += 1;
+  }
 
-            updateWrongUI();
-            if(studySetFilter && studySetFilter.value !== "all"){
-              applyFilters(true);
-            }
-            scheduleSaveProgress();
-          }
+  learningStats.updatedAt = Date.now();
 
-          btns.forEach((b, i)=>{
-            b.disabled = true;
-            if((opts[i] || "") === answerText) b.classList.add("correct");
-          });
+  saveLearningStatsToLocal(currentUserId);
+  updateLearningStatsUI();
+  scheduleSaveLearningStats();
+}
 
-          if(!ok) btn.classList.add("wrong");
+function renderQuestion({
+  container, qid, title, stem, options, answer, wordKey, level
+}){
+  const opts = (options || []).map(v => String(v ?? "").trim());
 
-          result.classList.remove("hidden");
-          result.innerHTML = ok
-            ? `✅ 答對了`
-            : `❌ 答錯，正確答案：<b>${answerText}</b>`;
-        };
+  // 顯示用 safe 版本，只用在 insertAdjacentHTML 裡
+  const safeQid = String(qid || "").replace(/[^\w-]/g, "");
+  const safeTitle = escapeHTML(title);
+  const safeStem = escapeHTML(stem);
+  const safeOpts = opts.map(opt => escapeHTML(opt));
+
+  container.insertAdjacentHTML("beforeend", `
+    <div class="quiz-q" id="${safeQid}">
+      <h4>${safeTitle}</h4>
+      <p class="quiz-stem">${safeStem}</p>
+      <div class="quiz-options">
+        ${safeOpts.map((opt, idx) => `<button class="quiz-option" data-idx="${idx}">${opt}</button>`).join("")}
+      </div>
+      <div class="quiz-result hidden"></div>
+    </div>
+  `);
+
+  const qEl = document.getElementById(safeQid);
+  if(!qEl) return;
+  const btns = [...qEl.querySelectorAll(".quiz-option")];
+  const result = qEl.querySelector(".quiz-result");
+
+  const answerText = String(answer ?? "").trim();
+  let answered = false;
+
+  btns.forEach(btn=>{
+    btn.onclick = () => {
+      if (answered) return;
+      answered = true;
+
+      const idx = Number(btn.getAttribute("data-idx"));
+      const chosen = opts[idx] || "";
+      const ok = chosen === answerText;
+
+      recordLearningAnswer(qid, ok, level);
+
+      if(!ok && wordKey){
+        if (typeof markWrongWord === "function") markWrongWord(wordKey);
+        else wrongSet.add(wordKey);
+
+        updateWrongUI();
+
+        if(studySetFilter && studySetFilter.value !== "all"){
+          applyFilters(true);
+        }
+
+        scheduleSaveProgress();
+      }
+
+      btns.forEach((b, i)=>{
+        b.disabled = true;
+        if((opts[i] || "") === answerText) b.classList.add("correct");
       });
-    }
+
+      if(!ok) btn.classList.add("wrong");
+
+      result.classList.remove("hidden");
+      result.innerHTML = ok
+        ? `✅ 答對了`
+        : `❌ 答錯，正確答案：<b>${escapeHTML(answerText)}</b>`;
+    };
+  });
+}
+
+
 
 
     function getQuizTypeState(){
+      const selected = document.querySelector('input[name="quizType"]:checked')?.value || "q1";
+
       return {
-        q1: !!toggleQ1.checked,
-        q2: !!toggleQ2.checked,
-        q3: !!toggleQ3.checked
+        q1: selected === "q1",
+        q2: selected === "q2",
+        q3: selected === "q3"
       };
     }
+
+
 
     function getActiveQuizData(){
       if(!wrongOnlyMode) return filteredData;
       return filteredData.filter(d => wrongSet.has(d.word));
     }
+
 
     function updateWrongUI(){
       if(wrongCountText) wrongCountText.textContent = String(wrongSet.size);
@@ -1621,6 +2171,8 @@ function mapRowsToObjects(rows){
       if(wrongStat) wrongStat.textContent = `Wrong: ${wrongSet.size}`;
       if(starStat) starStat.textContent = `Starred: ${starredSet.size}`;
     }
+
+
 
 
     function syncQuizIndexWithActivePool(){
@@ -1633,6 +2185,7 @@ function mapRowsToObjects(rows){
       if(quizIndex < 0) quizIndex = 0;
     }
 
+
     function sampleWrong(pool, correct, n=3){
       const c = String(correct || "").trim();
       const uniq = [...new Set(
@@ -1643,9 +2196,11 @@ function mapRowsToObjects(rows){
       return shuffle(uniq).slice(0, n);
     }
 
+
     function renderQuiz(){
       const activeData = getActiveQuizData(); // 可能是 filteredData 或只錯題子集
       const total = activeData.length;
+
 
       if(!total){
         quizCard.innerHTML = wrongOnlyMode
@@ -1656,17 +2211,21 @@ function mapRowsToObjects(rows){
         return;
       }
 
+
       // 保險：避免索引超界
       if(quizIndex >= total) quizIndex = 0;
       if(quizIndex < 0) quizIndex = 0;
+
 
       const d = activeData[quizIndex];
       quizCountPill.textContent = `${quizIndex + 1} / ${total}`;
       updateWrongUI();
 
+
       const zhPool = allData.map(x => x.zh).filter(Boolean);
       const wordPool = allData.map(x => x.word).filter(Boolean);
       const answerPool = allData.map(x => x.answer).filter(Boolean);
+
 
       const q1Answer = String(d.zh || "").trim() || "-";
       const q1Options = ensureOptions(
@@ -1675,12 +2234,14 @@ function mapRowsToObjects(rows){
         zhPool
       );
 
+
       const q2Answer = d.word || "-";
       const q2Stem = maskWordInSentence(d.example_en || "-", d.word || "");
       const q2Options = ensureOptions(
         shuffle([q2Answer, ...sampleWrong(wordPool, q2Answer, 3)]),
         q2Answer
       );
+
 
       const q3Answer = d.answer || "-";
       const q3Stem = maskWordInSentence(d.reading_en || "-", d.answer || "");
@@ -1689,38 +2250,46 @@ function mapRowsToObjects(rows){
         q3Answer
       );
 
+
       const { q1: showQ1, q2: showQ2, q3: showQ3 } = getQuizTypeState();
 
+
       quizCard.innerHTML = "";
+
 
       if(!showQ1 && !showQ2 && !showQ3){
         quizCard.innerHTML = `<div class="empty"><h3>請至少勾選一種題型（Q1 / Q2 / Q3）</h3></div>`;
         return;
       }
 
+
       if(showQ1){
         renderQuestion({
           container: quizCard,
           qid: "q1",
-          title: "Q1. 字義選擇",
+          title: "Q1. 單字翻譯",
           stem: `單字：${d.word || "-"}`,
           options: q1Options,
           answer: q1Answer,
-          wordKey: d.word || ""
-        }); 
+          wordKey: d.word || "",
+          level: d.level || ""
+       });
       }
+
 
       if(showQ2){
         renderQuestion({
           container: quizCard,
           qid: "q2",
-          title: "Q2. 選最合適的單字填入例句",
+          title: "Q2. 短句克漏字",
           stem: q2Stem,
           options: q2Options,
           answer: q2Answer,
-          wordKey: d.word || ""
+          wordKey: d.word || "",
+          level: d.level || ""          
         });
       }
+
 
       if(showQ3){
         renderQuestion({
@@ -1730,155 +2299,194 @@ function mapRowsToObjects(rows){
           stem: q3Stem,
           options: q3Options,
           answer: q3Answer,
-          wordKey: d.word || ""
+          wordKey: d.word || "",
+          level: d.level || ""
         });
       }
     }
 
 
+
+
     quizIndex = 0;
     function renderFlashcard(){
-      const total = filteredData.length;
-      if(!total){
-        flashCard.innerHTML = `<div class="empty"><h3>沒有符合條件的資料</h3></div>`;
-        countPill.textContent = `0 / 0`;
-        filterStat.textContent = "0 筆";
-        return;
-      }
-
-      const d = filteredData[currentIndex];
-      const showZh = true; // PATCH: 上方全域開關移除，其他中文內容維持顯示
-
-      countPill.textContent = `${currentIndex + 1} / ${total}`;
-      filterStat.textContent = `${total} 筆`;
-
-      flashCard.innerHTML = `
-<div class="fc-head">
-  <div class="fc-main">
-    <div class="word">${d.word || ""}</div>
-    ${showZh ? `<div class="zh">${d.zh || ""}</div>` : ``}
-    <div class="tiny">US ${d.ipa_us || ""}</div>
-  </div>
-
-  <!-- 詞性先 -->
-  <div class="fc-meta">
-    <div class="tiny">詞性</div>
-    <div class="fc-meta-value">${d.pos || "-"}</div>
-  </div>
-
-  <!-- Level 後 -->
-  <div class="fc-meta">
-    <div class="tiny">Level</div>
-    <div class="fc-meta-value">${d.level || "-"}</div>
-  </div>
-
-  <div class="fc-actions">
-    <button id="speakBtn" class="ghost">🔊 發音</button>
-    <button id="starBtn" class="ghost">${starredSet.has(d.word) ? "⭐ 已收藏" : "☆ 收藏"}</button>
-    <button id="prevBtn">上一個</button>
-    <button id="nextBtn" class="primary">下一個</button>
-    <button id="randomBtn" class="ghost">隨機</button>
-  </div>
-</div>
+       const total = filteredData.length;
+       if(!total){
+         flashCard.innerHTML = `<div class="empty"><h3>沒有符合條件的資料</h3></div>`;
+         countPill.textContent = `0 / 0`;
+         filterStat.textContent = "0 筆";
+         return;
+       }
 
 
-        <div class="box" style="margin-top:10px;">
-          <div class="tiny">Morpheme Highlight</div>
-          <div class="text">
-            <span class="pill">Prefix: ${d.prefix || "-"}</span>
-            <span class="pill">Root: ${d.root || "-"}</span>
-            <span class="pill">Suffix: ${d.suffix || "-"}</span>
-          </div>
-        </div>
+       const d = filteredData[currentIndex];
+       const showZh = true; // PATCH: 上方全域開關移除，其他中文內容維持顯示
 
-        <div class="grid2" style="margin-top:10px;">
-      <div class="box">
-        <h4>例句與延伸</h4>
 
-        <p class="text ex-card">
-          <b>Examples</b><br>
-          ${d.example_en || "-"}
-          ${showZh ? `<br><b>例句翻譯</b><br>${d.example_zh || "-"}` : ``}
-        </p>
+       // 顯示用安全版本：只用在 innerHTML template 裡
+       const safe = {};
+       Object.keys(d || {}).forEach(k => {
+         safe[k] = escapeHTML(d[k]);
+       });
 
-        <p class="text"><b>常見搭配詞</b><br>${d.collocation || "-"}</p>
-        ${showZh ? `<p class="text"><b>同源字</b><br>${d.cognate_extension_zh || "-"}</p>` : ``}
-        ${showZh ? `<p class="text"><b>詞性延伸</b><br>${d.word_family_zh || "-"}</p>` : ``}
+
+       countPill.textContent = `${currentIndex + 1} / ${total}`;
+       filterStat.textContent = `${total} 筆`;
+
+
+       flashCard.innerHTML = `
+     <div class="fc-head">
+       <div class="fc-main">
+         <div class="word">${safe.word || ""}</div>
+         ${showZh ? `<div class="zh">${safe.zh || ""}</div>` : ``}
+         <div class="tiny">US ${safe.ipa_us || ""}</div>
+       </div>
+
+
+       <!-- 詞性先 -->
+        <div class="fc-meta">
+         <div class="tiny">詞性</div>
+         <div class="fc-meta-value">${safe.pos || "-"}</div>
+       </div>
+
+
+       <!-- Level 後 -->
+       <div class="fc-meta">
+         <div class="tiny">Level</div>
+         <div class="fc-meta-value">${safe.level || "-"}</div>
+       </div>
+
+
+       <div class="fc-actions">
+         <button id="speakBtn" class="ghost">🔊 發音</button>
+         <button id="starBtn" class="ghost">${starredSet.has(d.word) ? "⭐ 已收藏" : "☆ 收藏"}</button>
+         <button id="prevBtn">上一個</button>
+         <button id="nextBtn" class="primary">下一個</button>
+         <button id="randomBtn" class="ghost">隨機</button>
+       </div>
       </div>
 
-          <div class="box">
-            <h4>詞源解析</h4>
-            <p class="text"><b>Prefix</b>: ${d.prefix || "-"} / ${d.prefix_meaning || "-"} ${showZh ? `（${d.prefix_meaning_zh || "-"}）` : ""}</p>
-            <p class="text"><b>Root</b>: ${d.root || "-"} / ${d.root_meaning || "-"} ${showZh ? `（${d.root_meaning_zh || "-"}）` : ""}</p>
-            <p class="text"><b>Suffix</b>: ${d.suffix || "-"} / ${d.suffix_meaning || "-"}</p>
-            ${showZh ? `<p class="text"><b>字源字義</b>：${d.literal_imagery_zh || "-"}</p>` : ``}
-            ${showZh ? `<p class="text"><b>引申字義</b>：${d.meaning_association_zh || "-"}</p>` : ``}
-            ${showZh ? `<p class="text"><b>常見用法</b>：${d.usage_note_zh || "-"}</p>` : ``}
-          </div>
-        </div>
 
-        <div class="reading">
-          <div class="reading-head">
-            <h3>閱讀短文</h3>
-            <button type="button" class="ghost toggle-zh-btn">展開中文翻譯</button>
-          </div>
-          <p>${d.reading_en || "-"}</p>
-          <p class="zh-reading is-collapsed">${d.reading_zh || "-"}</p>
-        </div>
-      `;
-
-    document.getElementById("prevBtn").onclick = () => {
-      currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length;
-      renderFlashcard();
-      if(autoSpeakToggle.checked) speakCurrent();
-    };
-    document.getElementById("nextBtn").onclick = () => {
-      currentIndex = (currentIndex + 1) % filteredData.length;
-      renderFlashcard();
-      if(autoSpeakToggle.checked) speakCurrent();
-     };
-    document.getElementById("speakBtn").onclick = async () => {
-      // ensure voices warm-up right at user gesture
-      try { window.speechSynthesis?.getVoices?.(); } catch(e) {}
-      speakCurrent();
-    };
-
-    document.getElementById("randomBtn").onclick = () => {
-      if(!filteredData.length) return;
-      if(filteredData.length === 1){
-        if(autoSpeakToggle.checked) speakCurrent();
-        return;
-      }
-
-      let next = currentIndex;
-      while(next === currentIndex){
-        next = Math.floor(Math.random() * filteredData.length);
-      }
-      currentIndex = next;
-
-      renderFlashcard();
-      if(autoSpeakToggle.checked) speakCurrent();
-    };
+     <div class="box" style="margin-top:10px;">
+       <div class="tiny">Morpheme Highlight</div>
+       <div class="text">
+         <span class="pill">Prefix: ${safe.prefix || "-"}</span>
+         <span class="pill">Root: ${safe.root || "-"}</span>
+         <span class="pill">Suffix: ${safe.suffix || "-"}</span>
+       </div>
+     </div>
 
 
+     <div class="grid2" style="margin-top:10px;">
+       <div class="box">
+         <h4>例句與延伸</h4>
 
-    // ⭐ 一定要放在 renderFlashcard() 內，因為 starBtn 是動態產生的
-    document.getElementById("starBtn").onclick = () => {
-      const w = d.word;
-      if(!w) return;
 
-      if(starredSet.has(w)) starredSet.delete(w);
-      else starredSet.add(w);
+         <p class="text ex-card">
+           <b>Examples</b><br>
+           ${safe.example_en || "-"}
+           ${showZh ? `<br><b>例句翻譯</b><br>${safe.example_zh || "-"}` : ``}
+         </p>
 
-      updateWrongUI();
-      if(studySetFilter && studySetFilter.value !== "all"){
-        applyFilters(true);
-      } else {
-        renderFlashcard(); // 更新按鈕文字（☆/⭐）
-      }
-      scheduleSaveProgress(); // ✅ 新增
-    };
-    } // ✅ 這個是 renderFlashcard() 的結尾
+
+         <p class="text"><b>常見搭配詞</b><br>${safe.collocation || "-"}</p>
+         ${showZh ? `<p class="text"><b>同源字</b><br>${safe.cognate_extension_zh || "-"}</p>` : ``}
+         ${showZh ? `<p class="text"><b>詞性延伸</b><br>${safe.word_family_zh || "-"}</p>` : ``}
+       </div>
+
+
+       <div class="box">
+         <h4>詞源解析</h4>
+         <p class="text"><b>Prefix</b>: ${safe.prefix || "-"} / ${safe.prefix_meaning || "-"} ${showZh ? `（${safe.prefix_meaning_zh || "-"}）` :     ""}</p>
+         <p class="text"><b>Root</b>: ${safe.root || "-"} / ${safe.root_meaning || "-"} ${showZh ? `（${safe.root_meaning_zh || "-"}）` : ""}</p>
+         <p class="text"><b>Suffix</b>: ${safe.suffix || "-"} / ${safe.suffix_meaning || "-"}</p>
+         ${showZh ? `<p class="text"><b>字源字義</b>：${safe.literal_imagery_zh || "-"}</p>` : ``}
+         ${showZh ? `<p class="text"><b>引申字義</b>：${safe.meaning_association_zh || "-"}</p>` : ``}
+         ${showZh ? `<p class="text"><b>常見用法</b>：${safe.usage_note_zh || "-"}</p>` : ``}
+       </div>
+     </div>
+
+
+     <div class="reading">
+       <div class="reading-head">
+         <h3>閱讀短文</h3>
+         <button type="button" class="ghost toggle-zh-btn">展開中文翻譯</button>
+       </div>
+       <p>${safe.reading_en || "-"}</p>
+       <p class="zh-reading is-collapsed">${safe.reading_zh || "-"}</p>
+     </div>
+       `;
+
+
+       document.getElementById("prevBtn").onclick = () => {
+         currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length;
+         renderFlashcard();
+         if(autoSpeakToggle.checked) speakCurrent();
+       };
+
+
+       document.getElementById("nextBtn").onclick = () => {
+         currentIndex = (currentIndex + 1) % filteredData.length;
+         renderFlashcard();
+         if(autoSpeakToggle.checked) speakCurrent();
+       };
+
+
+       document.getElementById("speakBtn").onclick = async () => {
+         // ensure voices warm-up right at user gesture
+         try { window.speechSynthesis?.getVoices?.(); } catch(e) {}
+         speakCurrent();
+       };
+
+
+        document.getElementById("randomBtn").onclick = () => {
+         if(!filteredData.length) return;
+
+
+         if(filteredData.length === 1){
+           if(autoSpeakToggle.checked) speakCurrent();
+           return;
+          }
+
+
+         let next = currentIndex;
+         while(next === currentIndex){
+           next = Math.floor(Math.random() * filteredData.length);
+         }
+
+
+         currentIndex = next;
+         renderFlashcard();
+
+
+         if(autoSpeakToggle.checked) speakCurrent();
+       };
+
+
+       // ⭐ 一定要放在 renderFlashcard() 內，因為 starBtn 是動態產生的
+       document.getElementById("starBtn").onclick = () => {
+         const w = d.word;
+          if(!w) return;
+
+
+         if(starredSet.has(w)) starredSet.delete(w);
+          else starredSet.add(w);
+
+
+         updateWrongUI();
+
+
+         if(studySetFilter && studySetFilter.value !== "all"){
+           applyFilters(true);
+         } else {
+           renderFlashcard(); // 更新按鈕文字（☆/⭐）
+         }
+
+
+         scheduleSaveProgress();
+       };
+     }  // ✅ 這個是 renderFlashcard() 的結尾
+
 
     async function loadDataIntoApp(rows, sourceLabel, options = {}){
       allData = mapRowsToObjects(rows);
@@ -1887,29 +2495,39 @@ function mapRowsToObjects(rows){
       quizIndex = 0;
       resetQuizRandomOrder(currentIndex);
 
+
       buildFilters();
       sanitizeSetsByCurrentData();
       updateWrongUI();
+
 
       filterBar.classList.remove("hidden");
       emptyState.classList.add("hidden");
       flashSection.classList.remove("hidden");
       quizTabBtn.disabled = false;
 
+
       meta.innerHTML = `狀態：<span class="ok">已載入</span> ${allData.length} 筆資料（來源：${sourceLabel}）`;
+
 
       if(options.skipProgressSync){
         // cache-hit fast path：不等待雲端同步，先秒開畫面
         sanitizeSetsByCurrentData();
         updateWrongUI();
+
+        learningStats = normalizeLearningStats(loadLearningStatsFromLocal(currentUserId));
+        updateLearningStatsUI();
+
         renderFlashcard();
         if(!quizSection.classList.contains("hidden")) renderQuiz();
       }else{
         // normal path：做 local/cloud merge 後再渲染
         await applyUserProgress(currentUserId);
+        await applyUserLearningStats(currentUserId);
         renderFlashcard();
         if(!quizSection.classList.contains("hidden")) renderQuiz();
       }
+
 
       if(autoSpeakToggle.checked){
         if(speechReady){
@@ -1922,6 +2540,8 @@ function mapRowsToObjects(rows){
     }
 
 
+
+
     csvFile.addEventListener("change", ()=>{
       const f = csvFile.files?.[0];
       fileName.textContent = f ? f.name : "尚未選擇檔案";
@@ -1929,56 +2549,88 @@ function mapRowsToObjects(rows){
     });
 
 
+
+
     importBtn.addEventListener("click", async ()=>{
       const f = csvFile.files?.[0];
       if(!f) return alert("請先選擇檔案");
+
 
       const text = await f.text();
       const { rows, delimiter } = parseDelimited(text);
       if(!rows.length) return alert("檔案為空");
 
+
       await loadDataIntoApp(rows, `本機檔案 / ${delimiter === "\t" ? "Tab" : "Comma"}`);
     });
 
 
+
+
 let isMasterLoading = false;
+
 
 loadMasterBtn.addEventListener("click", async ()=>{
   if(isMasterLoading) return;
   isMasterLoading = true;
   loadMasterBtn.disabled = true;
 
+
   const userId = String(currentUserId || "rachel").toLowerCase();
   const cache = loadMasterCache(userId); // 先拿快取備援
+
 
   try{
     meta.textContent = "狀態：檢查 Master 版本中...";
 
+
     const result = await loadMasterByChunks({
       userId,
-      chunkSize: DEFAULT_MASTER_CHUNK_SIZE || 300,
+      chunkSize: DEFAULT_MASTER_CHUNK_SIZE || 800,
       ifVersion: cache?.dataVersion || "",
       onProgress: (done, total) => {
         meta.textContent = `狀態：載入 Master 中... ${done}/${total} chunks`;
       }
     });
 
-    if(result.notModified){
-      if(cache?.rows?.length){
-        await loadDataIntoApp(
-          cache.rows,
-          `Master CSV(Cache Hit) / v=${cache.dataVersion}`,
-          { skipProgressSync: true }
-        );
-        meta.textContent = `狀態：Master 秒開（快取命中，v=${cache.dataVersion}）`;
-        return;
-      }
-      throw new Error("notModified but no local cache");
-    }
+
+if(result.notModified){
+  if(cache?.rows?.length){
+    await loadDataIntoApp(
+      cache.rows,
+      `Master CSV(Cache Hit) / v=${cache.dataVersion}`,
+      { skipProgressSync: true }
+    );
+
+    meta.textContent = `狀態：Master 秒開（快取命中，v=${cache.dataVersion}），同步進度與統計中...`;
+
+    Promise.all([
+      applyUserProgress(currentUserId),
+      applyUserLearningStats(currentUserId)
+    ])
+      .then(() => {
+        renderFlashcard();
+        if(!quizSection.classList.contains("hidden")) renderQuiz();
+        updateLearningStatsUI();
+        meta.textContent = `狀態：Master 秒開（快取命中，v=${cache.dataVersion}），進度與統計已同步`;
+     })
+      .catch(err => {
+        console.warn("Background progress/stats sync failed:", err);
+        setSyncState("progress/stats sync failed");
+      });
+
+    return;
+  }
+
+  throw new Error("notModified but no local cache");
+}
+
+
 
     if(!result.rows || result.rows.length < 1){
       throw new Error("Master 資料為空");
     }
+
 
     await loadDataIntoApp(
       result.rows,
@@ -1986,8 +2638,10 @@ loadMasterBtn.addEventListener("click", async ()=>{
     );
     meta.textContent = `狀態：Master 載入完成（${result.rowCount} 筆 / ${result.totalChunks} chunks）`;
 
+
   }catch(err){
     console.error("Master load failed:", err);
+
 
     // ✅ fallback 到舊快取，不清掉
     if(cache?.rows?.length){
@@ -2010,25 +2664,64 @@ loadMasterBtn.addEventListener("click", async ()=>{
 
 
 
-   userSelect.addEventListener("change", async () => {
-      if(saveTimer){
-        clearTimeout(saveTimer);
-        saveTimer = null;
-      }
+userSelect.addEventListener("change", async () => {
+  const oldUserId = currentUserId;
+  const newUserId = String(userSelect.value || "rachel").toLowerCase();
 
-      // 先保存舊 user（只存本機，避免 WrongBook 累積重複）
-      saveProgressToLocal(currentUserId);
+  // 停止 progress debounce
+  if(saveTimer){
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
 
-      // 再載入新 user
-      await applyUserProgress(userSelect.value);
+  // 停止 learning stats debounce
+  if(learningStatsSaveTimer){
+    clearTimeout(learningStatsSaveTimer);
+    learningStatsSaveTimer = null;
+  }
 
-    });
+  // 先保存舊 user 到本機，避免資料遺失
+  saveProgressToLocal(oldUserId);
+  saveLearningStatsToLocal(oldUserId);
+  const oldLearningStatsSnapshot = normalizeLearningStats(learningStats);
+
+  // 切換前先把舊 user 的 progress 寫到雲端
+  try{
+    setSyncState(`saving ${oldUserId} progress...`);
+    await saveProgressToCloud(oldUserId);
+    setSyncState(`${oldUserId} progress saved`);
+  }catch(err){
+    console.warn("Save old user progress before switching failed:", err);
+    setSyncState("old user progress save failed, kept local");
+  }
+
+  // 切換前再把舊 user 的 learning stats 寫到雲端
+  try{
+    setSyncState(`saving ${oldUserId} stats...`);
+    await saveLearningStatsToCloud(oldUserId, oldLearningStatsSnapshot);
+    setSyncState(`${oldUserId} stats saved`);
+  }catch(err){
+    console.warn("Save old user learning stats before switching failed:", err);
+    setSyncState("old user stats save failed, kept local");
+  }
+
+  // 再載入新 user
+  await applyUserProgress(newUserId);
+  await applyUserLearningStats(newUserId);
+
+  updateWrongUI();
+  updateLearningStatsUI();
+});
+
+
+
 
 
     searchInput.addEventListener("input", ()=>applyFilters(true));
     levelFilter.addEventListener("change", ()=>applyFilters(true));
     unitFilter.addEventListener("change", ()=>applyFilters(true));
     studySetFilter.addEventListener("change", ()=>applyFilters(true));
+
 
     clearFilterBtn.addEventListener("click", ()=>{
       // 依你需求：清除篩選後保留目前單字位置（以單字字串回找）
@@ -2047,14 +2740,17 @@ loadMasterBtn.addEventListener("click", async ()=>{
       renderFlashcard();
     });
 
+
     rateRange.addEventListener("input", ()=>{
       rateText.textContent = `${Number(rateRange.value).toFixed(1)}x`;
     });
+
 
     resetRateBtn.addEventListener("click", ()=>{
       rateRange.value = "1.0";
       rateText.textContent = "1.0x";
     });
+
 
     flashTabBtn.addEventListener("click", ()=>{
       flashTabBtn.classList.add("active");
@@ -2062,6 +2758,7 @@ loadMasterBtn.addEventListener("click", async ()=>{
       flashSection.classList.remove("hidden");
       quizSection.classList.add("hidden");
     });
+
 
     quizTabBtn.addEventListener("click", ()=>{
       quizTabBtn.classList.add("active");
@@ -2072,12 +2769,14 @@ loadMasterBtn.addEventListener("click", async ()=>{
       renderQuiz();
     });
 
+
     quizPrevBtn.addEventListener("click", ()=>{
       const active = getActiveQuizData();
       if(!active.length) return;
       quizIndex = (quizIndex - 1 + active.length) % active.length;
       renderQuiz();
     });
+
 
     quizNextBtn.addEventListener("click", ()=>{
       const active = getActiveQuizData();
@@ -2086,9 +2785,11 @@ loadMasterBtn.addEventListener("click", async ()=>{
       renderQuiz();
     });
 
+
     quizRandomBtn.addEventListener("click", ()=>{
       const active = getActiveQuizData();
       if(!active.length) return;
+
 
       if(active.length === 1){
         quizIndex = 0;
@@ -2096,14 +2797,17 @@ loadMasterBtn.addEventListener("click", async ()=>{
         return;
       }
 
+
       if(quizRandomOrder.length !== active.length || quizRandomPtr >= quizRandomOrder.length){
         resetQuizRandomOrder(quizIndex);
       }
+
 
       quizIndex = quizRandomOrder[quizRandomPtr];
       quizRandomPtr++;
       renderQuiz();
     });
+
 
     [toggleQ1, toggleQ2, toggleQ3].forEach(el=>{
       el.addEventListener("change", ()=>{
@@ -2111,12 +2815,12 @@ loadMasterBtn.addEventListener("click", async ()=>{
       });
     });
 
+
     resetQuizTypeBtn.addEventListener("click", ()=>{
       toggleQ1.checked = true;
-      toggleQ2.checked = true;
-      toggleQ3.checked = true;
       renderQuiz();
     });
+
 
     wrongOnlyBtn.addEventListener("click", ()=>{
       // 若沒有錯題，不能開
@@ -2125,6 +2829,7 @@ loadMasterBtn.addEventListener("click", async ()=>{
         return;
       }
 
+
       wrongOnlyMode = !wrongOnlyMode;
       quizIndex = 0;
       resetQuizRandomOrder(quizIndex);
@@ -2132,35 +2837,67 @@ loadMasterBtn.addEventListener("click", async ()=>{
       renderQuiz();
     });
 
-    resetWrongBtn.addEventListener("click", ()=>{
-      wrongSet.clear();
-      pendingWrongDelta.clear();
-      // 若正在錯題模式，清空後自動關閉
-      if(wrongOnlyMode) wrongOnlyMode = false;
-      quizIndex = 0;
-      resetQuizRandomOrder(quizIndex);
-      updateWrongUI();
-      if(studySetFilter && studySetFilter.value !== "all"){
-        applyFilters(true);
-      }
-      scheduleSaveProgress(); // ✅ 新增
-      renderQuiz();
 
-    });
+    resetWrongBtn.addEventListener("click", async ()=>{
+       const ok = confirm("確定要清空錯題嗎？這會同步清除雲端錯題本。");
+       if(!ok) return;
+
+
+       wrongSet.clear();
+       pendingWrongDelta.clear();
+
+
+       // 若正在錯題模式，清空後自動關閉
+       if(wrongOnlyMode) wrongOnlyMode = false;
+
+
+       quizIndex = 0;
+       resetQuizRandomOrder(quizIndex);
+       updateWrongUI();
+
+
+       saveProgressToLocal(currentUserId);
+
+
+       if(studySetFilter && studySetFilter.value !== "all"){
+         applyFilters(true);
+       }
+
+
+       renderQuiz();
+
+
+       try{
+         setSyncState("clearing wrong book...");
+         await clearWrongBookInCloud(currentUserId);
+         setSyncState("wrong book cleared");
+       }catch(err){
+         console.warn("Cloud clearWrongBook failed:", err);
+         setSyncState("clear cloud failed");
+         alert(`本機錯題已清空，但雲端清除失敗：${err.message}`);
+       }
+     });
+
+
+
 
     // 預設：匯入前隱藏篩選列
     filterBar.classList.add("hidden");
+
 
     // --- PATCH: 每張閱讀卡獨立展開/收合中文翻譯（事件委派） ---
     document.addEventListener("click", (e) => {
       const btn = e.target.closest(".toggle-zh-btn");
       if(!btn) return;
 
+
       const readingBox = btn.closest(".reading");
       if(!readingBox) return;
 
+
       const zh = readingBox.querySelector(".zh-reading");
       if(!zh) return;
+
 
       const collapsed = zh.classList.contains("is-collapsed");
       if(collapsed){
@@ -2172,19 +2909,23 @@ loadMasterBtn.addEventListener("click", async ()=>{
       }
     });
 
+
     // 初始化 sync 與 user（用 async IIFE 避免 race）
     (async () => {
       setSyncState("idle");
-      initSpeechEngine(); // ← 新增這行
-      window.speechSynthesis?.getVoices?.(); // ← 補這行
+      initSpeechEngine();
+      window.speechSynthesis?.getVoices?.();
       userSelect.value = currentUserId;
       await applyUserProgress(currentUserId);
+      await applyUserLearningStats(currentUserId);
       updateWrongUI();
+      updateLearningStatsUI();
     })();
 
 
     window.addEventListener("beforeunload", () => {
       saveProgressToLocal(currentUserId);
+      saveLearningStatsToLocal(currentUserId);
     });
 
   </script>
